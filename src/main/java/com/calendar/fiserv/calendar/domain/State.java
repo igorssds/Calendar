@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -30,7 +31,8 @@ import lombok.NoArgsConstructor;
 public class State {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@SequenceGenerator(name = "stateseq" , sequenceName = "STATE_PK" , allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "stateseq")
 	private Long id;
 
 	@NotNull
@@ -45,8 +47,10 @@ public class State {
 	private char active;
 
 	@NotNull
+	@Column(name = "creation_date")
 	private LocalDateTime creationDate;
 
+	@Column(name = "update_date")
 	private LocalDateTime updateDate;
 
 	@JsonIgnore
@@ -55,9 +59,11 @@ public class State {
 	@JoinColumn(name = "country_id")
 	private Country country;
 
+	@Column(nullable = true)
 	@OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
 	private List<City> citys;
 
+	@Column(nullable = true)
 	@OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
 	private List<HolliDayDate> hollyDayDate;
 

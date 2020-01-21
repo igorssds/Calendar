@@ -12,8 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import com.calendar.fiserv.calendar.domain.dto.CityDTO;
 
@@ -29,22 +29,25 @@ import lombok.NoArgsConstructor;
 public class City {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@SequenceGenerator(name = "cityseq" , sequenceName = "CITY_PK" , allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "cityseq")
 	private Long id;
 
-	@NotNull
-	@Column(length = 150)
+	@Column(length = 150 , nullable = false)
 	private String name;
 
-	@NotNull
-	@Column(length = 1)
+	
+	@Column(length = 1 , nullable = false)
 	private char active;
 
-	@NotNull
+	
+	@Column(name = "creation_date" , nullable = false)
 	private LocalDateTime creationDate;
 
+	@Column(name = "update_date")
 	private LocalDateTime updateDate;
 
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "state_id")
 	private State state;
@@ -53,6 +56,8 @@ public class City {
 	@JoinColumn(name = "country_id")
 	private Country country;
 
+	
+	@Column(nullable = true)
 	@OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
 	private List<HolliDayDate> hollyDayDate;
 	

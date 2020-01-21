@@ -1,13 +1,32 @@
 spring:
-  h2:    console:
-      path: /h2-console      enabled: true
+  datasource:
+    url: jdbc:oracle:thin:@//localhost:1521/xe
+    username: calendar
+    password: calendar
+    driver-class-name: oracle.jdbc.OracleDriver
+  application:
+    name: apitemplate
+  jmx:
+    enabled: false
   jpa:
-    properties:      hibernate:
-        format_sql: true    show-sql: true
-  datasource:    url: jdbc:h2:file:~/test
-    username: sa
-    password: 
-    driver-class-name: org.h2.Driver
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.Oracle12cDialect
+        proc:
+          param_null_passing: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
   liquibase:
     change-log: classpath:changelog.xml
-    enabled: true  
+    enabled: true
+    liquibase-schema: calendar
+  output:
+    ansi:
+      enabled: ALWAYS

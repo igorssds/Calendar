@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.calendar.fiserv.calendar.domain.dto.HolliDayDateDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "holliday_date")
+@Table(name = "HOLLIDAY_DATE")
 public class HolliDayDate {
 
 	@EmbeddedId
@@ -33,17 +34,18 @@ public class HolliDayDate {
 	@NotNull
 	private char active;
 
-	@NotNull
+
+	@Column(name = "CREATION_DATE" , nullable = false)
 	private LocalDateTime creationDate;
 
+	@Column(name = "update_date")
 	private LocalDateTime updateDate;
 
-	@NotNull
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "holliday_id", insertable = false, updatable = false)
 	private HolliDay holliday;
 
-	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "country_id", insertable = false, updatable = false)
 	private Country country;
@@ -70,20 +72,17 @@ public class HolliDayDate {
 		this.city = new City(dto.getCity());
 	}
 
-	@AllArgsConstructor
 	@Data
 	@EqualsAndHashCode
 	@Embeddable
 	public static class HollidayDateId implements Serializable {
-		public HollidayDateId() {
-		}
 
 		private static final long serialVersionUID = 1L;
 
-		@NotNull
+		@Column(nullable = false)
 		private Long day;
 
-		@NotNull
+		@Column(nullable = false)
 		private Long month;
 
 		private Long year;
@@ -91,10 +90,10 @@ public class HolliDayDate {
 		@Column(name = "country_id")
 		private Long countryId;
 
-		@Column(name = "state_id" , nullable = true)
+		@Column(name = "state_id", nullable = true)
 		private Long stateId;
 
-		@Column(name = "city_id" , nullable = true)
+		@Column(name = "city_id", nullable = true)
 		private Long cityId;
 
 		@Column(name = "holliday_id")
@@ -105,6 +104,28 @@ public class HolliDayDate {
 			this.month = dto.getMonth();
 			this.year = dto.getYear();
 		}
+
+		public HollidayDateId() {
+		}
+
+		public HollidayDateId(Long day, Long month, Long year, Long countryId, Long hollidayId) {
+			this.day = day;
+			this.month = month;
+			this.year = year;
+			this.countryId = countryId;
+			this.hollidayId = hollidayId;
+		}
+
+		public HollidayDateId(HollidayDateId id) {
+			this.cityId = id.getCityId();
+			this.countryId = id.getCountryId();
+			this.day = id.getDay();
+			this.hollidayId = id.hollidayId;
+			this.month = id.getMonth();
+			this.stateId = id.getStateId();
+			this.year = id.getYear();
+		}
+
 	}
 
 }

@@ -11,10 +11,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.calendar.fiserv.calendar.domain.dto.HolliDayDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +30,8 @@ import lombok.NoArgsConstructor;
 public class HolliDay {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@SequenceGenerator(name = "holliDayseq" , sequenceName = "HOLLIDAY_PK" , allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "holliDayseq")
 	private Long id;
 
 	@NotNull
@@ -40,10 +43,13 @@ public class HolliDay {
 	private char active;
 
 	@NotNull
+	@Column(name = "creation_date")
 	private LocalDateTime creationDate;
 
+	@Column(name = "update_date")
 	private LocalDateTime updateDate;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "holliday", fetch = FetchType.LAZY)
 	private List<HolliDayDate> hollyDayDate;
 
