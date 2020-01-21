@@ -141,13 +141,7 @@ public class HolliDayDateService {
 	}
 
 	public List<HolliDayDate> findAll() {
-		List<HolliDayDate> findAll = holliDayDateRepository.findAll();
-	
-		findAll.forEach(h ->{
-			h.getCity();
-		});
-		
-		return findAll;
+		return holliDayDateRepository.findAll();
 	}
 
 }
