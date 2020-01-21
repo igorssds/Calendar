@@ -43,11 +43,11 @@ public class HolliDayDate {
 
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "holliday_id", insertable = false, updatable = false)
+	@JoinColumn(name = "holliday_id", insertable = false, updatable = false , nullable = false)
 	private HolliDay holliday;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "country_id", insertable = false, updatable = false)
+	@JoinColumn(name = "country_id", insertable = false, updatable = false , nullable = false)
 	private Country country;
 
 	@ManyToOne(fetch = FetchType.LAZY)

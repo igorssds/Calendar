@@ -14,10 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import com.calendar.fiserv.calendar.domain.dto.StateDTO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,28 +33,27 @@ public class State {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "stateseq")
 	private Long id;
 
-	@NotNull
-	@Column(length = 150)
+	
+	@Column(length = 150 , nullable = false)
 	private String name;
 
 	@Column(length = 2)
 	private String code;
 
-	@NotNull
-	@Column(length = 1)
+	
+	@Column(length = 1 , nullable = false)
 	private char active;
 
-	@NotNull
-	@Column(name = "creation_date")
+	
+	@Column(name = "creation_date" , nullable = false)
 	private LocalDateTime creationDate;
 
 	@Column(name = "update_date")
 	private LocalDateTime updateDate;
 
-	@JsonIgnore
-	@NotNull
+	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "country_id")
+	@JoinColumn(name = "country_id" , nullable = false)
 	private Country country;
 
 	@Column(nullable = true)
