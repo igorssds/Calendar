@@ -4,19 +4,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.calendar.fiserv.calendar.domain.City;
-import com.calendar.fiserv.calendar.domain.Country;
-import com.calendar.fiserv.calendar.domain.HolliDay;
-import com.calendar.fiserv.calendar.domain.HolliDayDate;
-import com.calendar.fiserv.calendar.domain.HolliDayDate.HollidayDateId;
-import com.calendar.fiserv.calendar.domain.State;
+import com.calendar.fiserv.calendar.domain.ECity;
+import com.calendar.fiserv.calendar.domain.ECountry;
+import com.calendar.fiserv.calendar.domain.EHolliDay;
+import com.calendar.fiserv.calendar.domain.EHolliDayDate;
+import com.calendar.fiserv.calendar.domain.EState;
 import com.calendar.fiserv.calendar.repositories.CityRepository;
 import com.calendar.fiserv.calendar.repositories.CountryRepository;
 import com.calendar.fiserv.calendar.repositories.HolliDayRepository;
@@ -48,27 +46,24 @@ public class ExcelUtil {
 
 		for (int i = 1; i < ws.getPhysicalNumberOfRows(); i++) {
 
-			HolliDayDate holliDayDate = new HolliDayDate();
-			HollidayDateId dateId = new HollidayDateId();
-			HolliDay holliDay = new HolliDay();
-			City city = new City();
-			State state = new State();
-			Country country = new Country();
+			EHolliDayDate holliDayDate = new EHolliDayDate();
+			EHolliDay holliDay = new EHolliDay();
+			ECity city = new ECity();
+			EState state = new EState();
+			ECountry country = new ECountry();
 			Row row = ws.getRow(i);
 
 			if (row.getCell(0) == null)
 				continue;
 
-			dateId.setDay((long) row.getCell(0).getNumericCellValue());
+			holliDayDate.setDay((long) row.getCell(0).getNumericCellValue());
 
 			if (row.getCell(1) == null)
 				continue;
-			dateId.setMonth((long) row.getCell(1).getNumericCellValue());
+			holliDayDate.setMonth((long) row.getCell(1).getNumericCellValue());
 
-			if (row.getCell(2) == null) {
-				dateId.setYear(null);
-			} else {
-				dateId.setYear((long) row.getCell(2).getNumericCellValue());
+			if (row.getCell(2) != null) {
+				holliDayDate.setYear((long) row.getCell(2).getNumericCellValue());
 			}
 
 			holliDayDate.setActive(validateChar(row.getCell(3).getNumericCellValue()));
@@ -104,7 +99,7 @@ public class ExcelUtil {
 			country.setHasState(validateChar(row.getCell(14).getNumericCellValue()));
 			country.setCreationDate(LocalDateTime.now());
 
-			Country countryRecovered = countryRepository.findByName(country.getName());
+			ECountry countryRecovered = countryRepository.findByName(country.getName());
 
 			if (countryRecovered != null) {
 				country = null;
@@ -112,7 +107,7 @@ public class ExcelUtil {
 				country = countryRepository.save(country);
 			}
 
-			State stateRecovered = null;
+			EState stateRecovered = null;
 			if (state != null)
 				stateRecovered = stateRepository.findByName(state.getName());
 
@@ -123,7 +118,7 @@ public class ExcelUtil {
 				state = stateRepository.save(state);
 			}
 
-			City cityRecovered = null;
+			ECity cityRecovered = null;
 			if (state != null)
 				cityRepository.findByName(city.getName());
 
@@ -138,18 +133,7 @@ public class ExcelUtil {
 			holliDay.setCreationDate(LocalDateTime.now());
 			holliDay = holliDayRepository.save(holliDay);
 
-			if (city != null && cityRecovered != null)
-				dateId.setCityId(city == null ? cityRecovered.getId() : city.getId());
-
-			dateId.setCountryId(country == null ? countryRecovered.getId() : country.getId());
-
-			if (state != null & stateRecovered != null)
-				dateId.setStateId(state == null ? stateRecovered.getId() : state.getId());
-
-			dateId.setHollidayId(holliDay.getId());
-
 			holliDayDate.setHolliday(holliDay);
-			holliDayDate.setId(dateId);
 
 			if (city == null && cityRecovered == null) {
 				holliDayDate.setCity(null);

@@ -15,7 +15,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import com.calendar.fiserv.calendar.domain.dto.CityDTO;
+import com.calendar.fiserv.calendar.domain.dto.StateDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,16 +25,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "city")
-public class City {
+@Table(name = "state")
+public class EState {
 
 	@Id
-	@SequenceGenerator(name = "cityseq" , sequenceName = "CITY_PK" , allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "cityseq")
+	@SequenceGenerator(name = "stateseq" , sequenceName = "STATE_PK" , allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE , generator = "stateseq")
 	private Long id;
 
+	
 	@Column(length = 150 , nullable = false)
 	private String name;
+
+	@Column(length = 2)
+	private String code;
 
 	
 	@Column(length = 1 , nullable = false)
@@ -49,22 +53,21 @@ public class City {
 
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "state_id")
-	private State state;
+	@JoinColumn(name = "country_id" , nullable = false)
+	private ECountry country;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "country_id")
-	private Country country;
-
-	
 	@Column(nullable = true)
-	@OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
-	private List<HolliDayDate> hollyDayDate;
-	
-	public City(CityDTO dto) {
+	@OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
+	private List<ECity> citys;
+
+	@Column(nullable = true)
+	@OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
+	private List<EHolliDayDate> hollyDayDate;
+
+	public EState(StateDTO dto) {
 		this.name = dto.getName();
 		this.active = dto.getActive();
+		this.code = dto.getCode();
 		this.creationDate = LocalDateTime.now();
 	}
-
 }

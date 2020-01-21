@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "country")
-public class Country {
+public class ECountry {
 
 	@Id
 	@SequenceGenerator(name = "countryseq" , sequenceName = "COUNTRY_PK" , allocationSize = 1)
@@ -53,17 +53,17 @@ public class Country {
 
 	@Column(nullable = true)
 	@OneToMany(mappedBy = "country", fetch = FetchType.LAZY)
-	private List<State> states;
+	private List<EState> states;
 
 	@Column(nullable = true)
 	@OneToMany(mappedBy = "country", fetch = FetchType.LAZY)
-	private List<City> citys;
+	private List<ECity> citys;
 
 	@Column(nullable = true)
 	@OneToMany(mappedBy = "country", fetch = FetchType.LAZY)
-	private List<HolliDayDate> hollyDayDate;
+	private List<EHolliDayDate> hollyDayDate;
 
-	public Country(CountryDTO dto) {
+	public ECountry(CountryDTO dto) {
 		this.name = dto.getName();
 		this.code = dto.getCode();
 		this.active = dto.getActive();

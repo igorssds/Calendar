@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "holliday")
-public class HolliDay {
+public class EHolliDay {
 
 	@Id
 	@SequenceGenerator(name = "holliDayseq" , sequenceName = "HOLLIDAY_PK" , allocationSize = 1)
@@ -51,24 +51,24 @@ public class HolliDay {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "holliday", fetch = FetchType.LAZY)
-	private List<HolliDayDate> hollyDayDate;
+	private List<EHolliDayDate> hollyDayDate;
 
 	
 	
-	public HolliDay(HolliDayDTO dto, HolliDayDate holliDayDate) {
+	public EHolliDay(HolliDayDTO dto, EHolliDayDate holliDayDate) {
 		this.name = dto.getName();
 		this.active = dto.getActive();
 		this.hollyDayDate = Arrays.asList(holliDayDate);
 		this.creationDate = LocalDateTime.now();
 	}
 	
-	public HolliDay(HolliDayDTO dto) {
+	public EHolliDay(HolliDayDTO dto) {
 		this.name = dto.getName();
 		this.active = dto.getActive();
 		this.creationDate = LocalDateTime.now();
 	}
 
-	public HolliDay(Long id,  String name,  char active,  LocalDateTime creationDate,
+	public EHolliDay(Long id,  String name,  char active,  LocalDateTime creationDate,
 			LocalDateTime updateDate) {
 		this.id = id;
 		this.name = name;

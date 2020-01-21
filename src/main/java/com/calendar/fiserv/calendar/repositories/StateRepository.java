@@ -5,13 +5,13 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.calendar.fiserv.calendar.domain.State;
+import com.calendar.fiserv.calendar.domain.EState;
 
 @Repository
-public interface StateRepository extends JpaRepository<State, Long>{
+public interface StateRepository extends JpaRepository<EState, Long>{
 
-	Optional<State> findByCountryId(Long id);
+	Optional<EState> findByCountryId(Long id);
 
-	State findByName(String name);
+	EState findByName(String name);
 
 }

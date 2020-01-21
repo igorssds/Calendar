@@ -1,4 +1,4 @@
-package com.calendar.fiserv.calendar.resources;
+package com.calendar.fiserv.calendar.controllers;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.calendar.fiserv.calendar.domain.HolliDayDate;
+import com.calendar.fiserv.calendar.domain.EHolliDayDate;
 import com.calendar.fiserv.calendar.domain.dto.HolliDayDateDTO;
 import com.calendar.fiserv.calendar.services.ExcelUtil;
 import com.calendar.fiserv.calendar.services.HolliDayDateService;
 
 @RestController
 @RequestMapping("/holliday")
-public class HollidayDateResource {
+public class HollidayDateController {
 
 	@Autowired
 	private HolliDayDateService holliDayDateService;
@@ -42,7 +42,7 @@ public class HollidayDateResource {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<HolliDayDate>> findAll(){
+	public ResponseEntity<List<EHolliDayDate>> findAll(){
 		return ResponseEntity.ok().body(holliDayDateService.findAll());
 	}
 }

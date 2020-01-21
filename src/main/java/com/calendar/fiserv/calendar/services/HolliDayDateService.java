@@ -9,12 +9,11 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.calendar.fiserv.calendar.domain.City;
-import com.calendar.fiserv.calendar.domain.Country;
-import com.calendar.fiserv.calendar.domain.HolliDay;
-import com.calendar.fiserv.calendar.domain.HolliDayDate;
-import com.calendar.fiserv.calendar.domain.HolliDayDate.HollidayDateId;
-import com.calendar.fiserv.calendar.domain.State;
+import com.calendar.fiserv.calendar.domain.ECity;
+import com.calendar.fiserv.calendar.domain.ECountry;
+import com.calendar.fiserv.calendar.domain.EHolliDay;
+import com.calendar.fiserv.calendar.domain.EHolliDayDate;
+import com.calendar.fiserv.calendar.domain.EState;
 import com.calendar.fiserv.calendar.domain.dto.HolliDayDateDTO;
 import com.calendar.fiserv.calendar.repositories.CityRepository;
 import com.calendar.fiserv.calendar.repositories.CountryRepository;
@@ -41,35 +40,35 @@ public class HolliDayDateService {
 	private CityRepository cityRepository;
 
 	@Transactional
-	public HolliDayDate fromDTO(HolliDayDateDTO dto) {
+	public EHolliDayDate fromDTO(HolliDayDateDTO dto) {
 
-		Country country = new Country(null, dto.getCountry().getName().toUpperCase(),
+		ECountry country = new ECountry(null, dto.getCountry().getName().toUpperCase(),
 				dto.getCountry().getCode().toUpperCase(), dto.getCountry().getActive(), LocalDateTime.now(), null,
 				dto.getCountry().getHasState(), null, null, null);
 
-		HolliDay holliDay = new HolliDay(null, dto.getHolliday().getName(), dto.getHolliday().getActive(),
+		EHolliDay holliDay = new EHolliDay(null, dto.getHolliday().getName(), dto.getHolliday().getActive(),
 				LocalDateTime.now(), null);
 
-		State state;
+		EState state;
 		if (dto.getState() != null) {
-			state = new State(null, dto.getState().getName().toUpperCase(), dto.getState().getCode(),
+			state = new EState(null, dto.getState().getName().toUpperCase(), dto.getState().getCode(),
 					dto.getState().getActive(), LocalDateTime.now(), null, country, null, null);
 		} else {
 			state = null;
 		}
 
-		City city;
+		ECity city;
 		if (dto.getCity() != null) {
-			city = new City(null, dto.getCity().getName(), dto.getCity().getActive(), LocalDateTime.now(), null, state,
+			city = new ECity(null, dto.getCity().getName(), dto.getCity().getActive(), LocalDateTime.now(), null, state,
 					country, null);
 		} else {
 			city = null;
 		}
 
-		HolliDayDate holliDayDate = new HolliDayDate(null, dto.getActive(), LocalDateTime.now(), null, holliDay,
-				country, state, city);
+		EHolliDayDate holliDayDate = new EHolliDayDate(null, dto.getDay(), dto.getMonth(), dto.getYear(),
+				dto.getActive(), LocalDateTime.now(), null, holliDay, country, state, city);
 
-		Country countryRecovered = countryRepository.findByName(country.getName());
+		ECountry countryRecovered = countryRepository.findByName(country.getName());
 
 		if (countryRecovered != null) {
 			country = null;
@@ -77,7 +76,7 @@ public class HolliDayDateService {
 			country = countryRepository.save(country);
 		}
 
-		State stateRecovered = null;
+		EState stateRecovered = null;
 		if (state != null)
 			stateRecovered = stateRepository.findByName(state.getName());
 
@@ -89,7 +88,7 @@ public class HolliDayDateService {
 
 		}
 
-		City cityRecovered = null;
+		ECity cityRecovered = null;
 		if (city != null)
 			cityRecovered = cityRepository.findByName(city.getName());
 
@@ -103,7 +102,6 @@ public class HolliDayDateService {
 			city = cityRepository.save(city);
 		}
 
-		holliDay.setHollyDayDate(Arrays.asList(holliDayDate));
 		holliDay = holliDayRepository.save(holliDay);
 
 		holliDayDate.setCountry(country == null ? countryRecovered : country);
@@ -121,26 +119,16 @@ public class HolliDayDateService {
 		}
 
 		holliDayDate.setHolliday(holliDay);
-
-		HollidayDateId id = new HollidayDateId(dto.getDay(), dto.getMonth(), dto.getYear(),
-				country == null ? countryRecovered.getId() : country.getId(), holliDay.getId());
-
-		if (state != null || stateRecovered != null)
-			id.setStateId(state == null ? stateRecovered.getId() : state.getId());
-
-		if (city != null || cityRecovered != null)
-			id.setCityId(city == null ? cityRecovered.getId() : city.getId());
-
-		holliDayDate.setId(id);
+		holliDayDate.setId("CDHJ");
 
 		return holliDayDateRepository.save(holliDayDate);
 	}
 
-	public HolliDayDate insert(HolliDayDate holli) {
+	public EHolliDayDate insert(EHolliDayDate holli) {
 		return holliDayDateRepository.save(holli);
 	}
 
-	public List<HolliDayDate> findAll() {
+	public List<EHolliDayDate> findAll() {
 		return holliDayDateRepository.findAll();
 	}
 
