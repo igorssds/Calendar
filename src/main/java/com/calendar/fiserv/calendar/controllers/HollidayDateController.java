@@ -29,7 +29,7 @@ public class HollidayDateController {
 	@Autowired
 	private ExcelUtil util;
 
-	@PostMapping("/insert")
+	@PostMapping
 	public ResponseEntity<Void> insert(@RequestBody  HolliDayDateDTO dto) {
 		holliDayDateService.fromDTO(dto);
 		return ResponseEntity.status(HttpStatus.CREATED).build();

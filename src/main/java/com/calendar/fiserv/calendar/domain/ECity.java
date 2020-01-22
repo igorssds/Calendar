@@ -49,18 +49,13 @@ public class ECity {
 
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "state_id")
+	@JoinColumn(name = "state_id", insertable = false, updatable = false)
 	private EState state;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "country_id")
+	@JoinColumn(name = "country_id", insertable = false, updatable = false)
 	private ECountry country;
 
-	
-	@Column(nullable = true)
-	@OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
-	private List<EHolliDayDate> hollyDayDate;
-	
 	public ECity(CityDTO dto) {
 		this.name = dto.getName();
 		this.active = dto.getActive();
