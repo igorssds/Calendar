@@ -16,16 +16,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class CityDTO {
-	
+
+	private Long id;
+
 	@JsonProperty("name")
 	@NotBlank(message = "O nome não pode ser nulo ou vazio")
-	@Length(max = 150 , message = "O nome deve ter um tamanho maximo de 150 caracteres")
+	@Length(max = 150, message = "O nome deve ter um tamanho maximo de 150 caracteres")
 	private String name;
 
 	@JsonProperty("active")
 	@NotBlank(message = "O ativo não pode ser nulo ou vazio")
-	@Length(max = 1 , message = "O ativo deve conter apenas um caractere")
+	@Length(max = 1, message = "O ativo deve conter apenas um caractere")
 	private char active;
-	
+
 	List<HolliDayDateDTO> holliDayDate;
 }

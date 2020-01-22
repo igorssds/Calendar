@@ -1,9 +1,16 @@
 package com.calendar.fiserv.calendar.services;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -22,7 +29,7 @@ import com.calendar.fiserv.calendar.repositories.HollidayDateRepository;
 import com.calendar.fiserv.calendar.repositories.StateRepository;
 
 @Service
-public class ExcelUtil {
+public class ExcelService {
 
 	@Autowired
 	private HollidayDateRepository holliDayDateRepository;
@@ -156,5 +163,105 @@ public class ExcelUtil {
 
 	public char validateChar(double num) {
 		return num == 1 ? '1' : '0';
+	}
+	
+	public List<EHolliDayDate> temporare() {
+		EHolliDayDate holliDayDate = new EHolliDayDate();
+		EHolliDay holliDay = new EHolliDay();
+		ECity city = new ECity();
+		EState state = new EState();
+		ECountry country = new ECountry();
+
+		country.setName("BRASIL");
+		country.setActive('1');
+		country.setCode("BR");
+		country.setHasState('1');
+		country.setCreationDate(LocalDateTime.now());
+
+		state.setName("São Paulo");
+		state.setCode("SP");
+		state.setCreationDate(LocalDateTime.now());
+
+		city.setName("São Paulo");
+		city.setActive('1');
+		city.setCreationDate(LocalDateTime.now());
+
+		holliDay.setName("Aniversário de São Paulo");
+		holliDay.setCreationDate(LocalDateTime.now());
+
+		holliDayDate.setDay(25L);
+		holliDayDate.setMonth(03L);
+		holliDayDate.setYear(2020L);
+		holliDayDate.setActive('1');
+		holliDayDate.setCreationDate(LocalDateTime.now());
+		holliDayDate.setCountry(country);
+		holliDayDate.setState(state);
+		holliDayDate.setCity(city);
+		holliDayDate.setHolliday(holliDay);
+
+		List<EHolliDayDate> list = new ArrayList<>();
+		list.add(holliDayDate);
+		return list;
+	}
+
+	public byte[] exportHolliDay() throws IOException {
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet ws = wb.createSheet("Feriados");
+
+		List<EHolliDayDate> holliDayDate = temporare();
+
+		int headerCount = 0;
+		Row header = ws.createRow(0);
+
+		header.createCell(headerCount++).setCellValue("Tipo Feriado");
+		header.createCell(headerCount++).setCellValue("Data do feriado");
+		header.createCell(headerCount++).setCellValue("Nome do feriado");
+		header.createCell(headerCount++).setCellValue("Região");
+
+		int rownum = 1;
+
+		for (EHolliDayDate h : holliDayDate) {
+
+			Row row = ws.createRow(rownum++);
+			int cellnum = 0;
+
+			Cell cell = row.createCell(cellnum++);
+
+			if (h.getCity() != null) {
+				cell.setCellValue("Munincipal");
+			} else if (h.getState() != null) {
+				cell.setCellValue("Estadual");
+			} else {
+				cell.setCellValue("Nacional");
+			}
+
+			cell = row.createCell(cellnum++);
+			Long year = h.getYear() == null ? returnYearActual() : h.getYear();
+			cell.setCellValue("" + h.getDay() + "/" + h.getMonth() + "/" + year);
+
+			cell = row.createCell(cellnum++);
+			cell.setCellValue(h.getHolliday().getName());
+
+			cell = row.createCell(cellnum++);
+			
+			if (h.getCity() != null) {
+				cell.setCellValue(h.getCity().getName());
+			} else if (h.getState() != null) {
+				cell.setCellValue(h.getState().getName());
+			} else {
+				cell.setCellValue(h.getCountry().getName());
+			}
+		}
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		wb.write(out);
+		byte[] report = out.toByteArray();
+		out.close();
+		return report;
+
+	}
+
+	private Long returnYearActual() {
+		return (long) Calendar.getInstance().get(Calendar.YEAR);
 	}
 }

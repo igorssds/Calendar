@@ -8,4 +8,6 @@ import com.calendar.fiserv.calendar.domain.EHolliDay;
 @Repository
 public interface HolliDayRepository extends JpaRepository<EHolliDay, Long>{
 
+	EHolliDay findByName(String name);
+
 }

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class HolliDayDateDTO {
-	
+
 	@NotNull
 	private Long day;
 
@@ -23,21 +23,21 @@ public class HolliDayDateDTO {
 	private Long year;
 
 	private char active;
-	
+
 	@Valid
 	@JsonProperty(value = "state")
 	private StateDTO state;
-	
+
 	@Valid
 	@JsonProperty(value = "city")
 	private CityDTO city;
-	
+
 	@Valid
 	@JsonProperty(value = "country")
 	private CountryDTO country;
-	
+
 	@Valid
 	@JsonProperty(value = "holliday")
 	private HolliDayDTO holliday;
-	
+
 }

@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull;
 
 import com.calendar.fiserv.calendar.domain.dto.HolliDayDateDTO;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +25,7 @@ import lombok.NoArgsConstructor;
 public class EHolliDayDate {
 
 	@Id
-	@Column(name = "ROWID" , insertable = false , updatable = false)
+	@Column(name = "ROWID", insertable = false, updatable = false)
 	private String id;
 
 	@Column(nullable = false)
@@ -46,22 +45,18 @@ public class EHolliDayDate {
 	@Column(name = "update_date")
 	private LocalDateTime updateDate;
 
-	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "holliday_id", nullable = false)
 	private EHolliDay holliday;
 
-    @JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "country_id", nullable = false)
 	private ECountry country;
 
-    @JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "state_id")
 	private EState state;
 
-    @JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "city_id")
 	private ECity city;
