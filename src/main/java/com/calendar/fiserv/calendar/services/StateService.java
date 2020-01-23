@@ -18,7 +18,11 @@ public class StateService {
 
 	public EState stateFromDTO(StateDTO dto, ECountry country) {
 
-		EState state = stateRepository.findByName(dto.getName());
+		if (dto == null)
+			return new EState();
+
+		EState state = stateRepository.findByName(dto.getName().toUpperCase());
+
 		if (state == null) {
 			state = new EState(null, dto.getName().toUpperCase(), dto.getCode(), dto.getActive(), LocalDateTime.now(),
 					null, country, null, null);

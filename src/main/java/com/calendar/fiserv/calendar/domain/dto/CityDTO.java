@@ -25,8 +25,6 @@ public class CityDTO {
 	private String name;
 
 	@JsonProperty("active")
-	@NotBlank(message = "O ativo não pode ser nulo ou vazio")
-	@Length(max = 1, message = "O ativo deve conter apenas um caractere")
 	private char active;
 
 	List<HolliDayDateDTO> holliDayDate;

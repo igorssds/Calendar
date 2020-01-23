@@ -3,6 +3,8 @@ package com.calendar.fiserv.calendar.controllers;
 import java.io.IOException;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,7 @@ import com.calendar.fiserv.calendar.services.ExcelService;
 import com.calendar.fiserv.calendar.services.HolliDayDateService;
 import com.calendar.fiserv.calendar.services.HolliDayService;
 import com.calendar.fiserv.calendar.services.StateService;
+import com.calendar.fiserv.calendar.services.dto.HolliDayDateRemoveDTO;
 
 @RestController
 @RequestMapping(value = "/holliday", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,7 +54,7 @@ public class HollidayDateController {
 	private ExcelService util;
 
 	@PostMapping
-	public ResponseEntity<Void> insert(@RequestBody HolliDayDateDTO dto) {
+	public ResponseEntity<Void> insert(@Valid @RequestBody HolliDayDateDTO dto) {
 
 		ECountry country = countryService.countryFromDTO(dto.getCountry());
 		EState state = stateService.stateFromDTO(dto.getState(), country);
@@ -82,6 +85,12 @@ public class HollidayDateController {
 		httpHeaders.add("Content-Disposition", "attachment;filename= \"exportHolliDays.xls\"");
 
 		return ResponseEntity.ok().headers(httpHeaders).body(arquivo);
+	}
+
+	@PostMapping("/remove")
+	public ResponseEntity<Void> remove(@RequestBody HolliDayDateRemoveDTO dto) {
+		holliDayDateService.remove(dto);
+		return ResponseEntity.noContent().build();
 	}
 
 }

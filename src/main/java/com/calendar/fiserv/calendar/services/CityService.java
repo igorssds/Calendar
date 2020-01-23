@@ -19,7 +19,11 @@ public class CityService {
 
 	public ECity cityFromDTO(CityDTO dto, EState state, ECountry country) {
 
+		if (dto == null)
+			return new ECity();
+
 		ECity city = cityRepository.findByName(dto.getName().toUpperCase());
+
 		if (city == null) {
 			city = new ECity(null, dto.getName().toUpperCase(), dto.getActive(), LocalDateTime.now(), null, state,
 					country);

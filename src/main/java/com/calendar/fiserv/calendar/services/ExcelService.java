@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -22,6 +21,7 @@ import com.calendar.fiserv.calendar.domain.ECountry;
 import com.calendar.fiserv.calendar.domain.EHolliDay;
 import com.calendar.fiserv.calendar.domain.EHolliDayDate;
 import com.calendar.fiserv.calendar.domain.EState;
+import com.calendar.fiserv.calendar.domain.dto.HolliDayDateDTO;
 import com.calendar.fiserv.calendar.repositories.CityRepository;
 import com.calendar.fiserv.calendar.repositories.CountryRepository;
 import com.calendar.fiserv.calendar.repositories.HolliDayRepository;
@@ -45,6 +45,9 @@ public class ExcelService {
 
 	@Autowired
 	private CityRepository cityRepository;
+
+	@Autowired
+	private HolliDayDateService holliDayDateService;
 
 	public void readToHolliDays(InputStream stream) throws IOException {
 
@@ -75,7 +78,7 @@ public class ExcelService {
 
 			holliDayDate.setActive(validateChar(row.getCell(3).getNumericCellValue()));
 
-			holliDay.setName(row.getCell(4).getStringCellValue());
+			holliDay.setName(row.getCell(4).getStringCellValue().toUpperCase());
 			holliDay.setActive(validateChar(row.getCell(5).getNumericCellValue()));
 
 			if (row.getCell(6) == null) {
@@ -127,7 +130,7 @@ public class ExcelService {
 
 			ECity cityRecovered = null;
 			if (state != null)
-				cityRepository.findByName(city.getName());
+				cityRecovered = cityRepository.findByName(city.getName());
 
 			if (cityRecovered != null || city == null) {
 				city = null;
@@ -164,51 +167,12 @@ public class ExcelService {
 	public char validateChar(double num) {
 		return num == 1 ? '1' : '0';
 	}
-	
-	public List<EHolliDayDate> temporare() {
-		EHolliDayDate holliDayDate = new EHolliDayDate();
-		EHolliDay holliDay = new EHolliDay();
-		ECity city = new ECity();
-		EState state = new EState();
-		ECountry country = new ECountry();
-
-		country.setName("BRASIL");
-		country.setActive('1');
-		country.setCode("BR");
-		country.setHasState('1');
-		country.setCreationDate(LocalDateTime.now());
-
-		state.setName("São Paulo");
-		state.setCode("SP");
-		state.setCreationDate(LocalDateTime.now());
-
-		city.setName("São Paulo");
-		city.setActive('1');
-		city.setCreationDate(LocalDateTime.now());
-
-		holliDay.setName("Aniversário de São Paulo");
-		holliDay.setCreationDate(LocalDateTime.now());
-
-		holliDayDate.setDay(25L);
-		holliDayDate.setMonth(03L);
-		holliDayDate.setYear(2020L);
-		holliDayDate.setActive('1');
-		holliDayDate.setCreationDate(LocalDateTime.now());
-		holliDayDate.setCountry(country);
-		holliDayDate.setState(state);
-		holliDayDate.setCity(city);
-		holliDayDate.setHolliday(holliDay);
-
-		List<EHolliDayDate> list = new ArrayList<>();
-		list.add(holliDayDate);
-		return list;
-	}
 
 	public byte[] exportHolliDay() throws IOException {
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet ws = wb.createSheet("Feriados");
 
-		List<EHolliDayDate> holliDayDate = temporare();
+		List<HolliDayDateDTO> holliDayDate = holliDayDateService.findAll();
 
 		int headerCount = 0;
 		Row header = ws.createRow(0);
@@ -220,18 +184,18 @@ public class ExcelService {
 
 		int rownum = 1;
 
-		for (EHolliDayDate h : holliDayDate) {
+		for (HolliDayDateDTO h : holliDayDate) {
 
 			Row row = ws.createRow(rownum++);
 			int cellnum = 0;
 
 			Cell cell = row.createCell(cellnum++);
 
-			if (h.getCity() != null) {
+			if (h.getCity() != null && h.getCity().getName() != null) {
 				cell.setCellValue("Munincipal");
-			} else if (h.getState() != null) {
+			} else if (h.getState() != null && h.getState().getName() != null) {
 				cell.setCellValue("Estadual");
-			} else {
+			} else if (h.getCountry() != null && h.getCountry().getName() != null) {
 				cell.setCellValue("Nacional");
 			}
 
@@ -243,12 +207,12 @@ public class ExcelService {
 			cell.setCellValue(h.getHolliday().getName());
 
 			cell = row.createCell(cellnum++);
-			
-			if (h.getCity() != null) {
+
+			if (h.getCity() != null && h.getCity().getName() != null) {
 				cell.setCellValue(h.getCity().getName());
-			} else if (h.getState() != null) {
+			} else if (h.getState() != null && h.getState().getName() != null) {
 				cell.setCellValue(h.getState().getName());
-			} else {
+			} else if (h.getCountry() != null && h.getCountry().getName() != null) {
 				cell.setCellValue(h.getCountry().getName());
 			}
 		}

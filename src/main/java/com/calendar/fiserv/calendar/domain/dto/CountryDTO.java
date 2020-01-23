@@ -27,10 +27,8 @@ public class CountryDTO {
 	private String code;
 
 	@JsonProperty("active")
-	@Length(max = 1, message = "O Ativo deve conter apenas um caracter")
 	private char active;
 
 	@JsonProperty("hasState")
-	@Length(max = 1)
 	private char hasState;
 }

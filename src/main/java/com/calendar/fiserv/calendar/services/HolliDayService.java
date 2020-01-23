@@ -17,10 +17,10 @@ public class HolliDayService {
 
 	public EHolliDay holliDayFromDTO(HolliDayDTO dto) {
 
-		EHolliDay holliDay = holliDayRepository.findByName(dto.getName());
+		EHolliDay holliDay = holliDayRepository.findByName(dto.getName().toUpperCase());
 
 		if (holliDay == null) {
-			holliDay = new EHolliDay(null, dto.getName(), dto.getActive(), LocalDateTime.now(), null);
+			holliDay = new EHolliDay(null, dto.getName().toUpperCase(), dto.getActive(), LocalDateTime.now(), null);
 			holliDay = holliDayRepository.save(holliDay);
 		}
 		return holliDay;
