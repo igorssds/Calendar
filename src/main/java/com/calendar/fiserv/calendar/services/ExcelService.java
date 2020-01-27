@@ -7,10 +7,13 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +52,7 @@ public class ExcelService {
 	@Autowired
 	private HolliDayDateService holliDayDateService;
 
+	@Transactional
 	public void readToHolliDays(InputStream stream) throws IOException {
 
 		XSSFWorkbook wb = new XSSFWorkbook(stream);
@@ -66,13 +70,19 @@ public class ExcelService {
 			if (row.getCell(0) == null)
 				continue;
 
+			if ((long) row.getCell(0).getNumericCellValue() > 31)
+				continue;
+
 			holliDayDate.setDay((long) row.getCell(0).getNumericCellValue());
 
-			if (row.getCell(1) == null)
+			if (row.getCell(1) == null || (long) row.getCell(1).getNumericCellValue() > 12)
 				continue;
+
 			holliDayDate.setMonth((long) row.getCell(1).getNumericCellValue());
 
-			if (row.getCell(2) != null) {
+			Long year = returnYearActual();
+
+			if (row.getCell(2) != null && (long) row.getCell(2).getNumericCellValue() >= year) {
 				holliDayDate.setYear((long) row.getCell(2).getNumericCellValue());
 			}
 
@@ -141,9 +151,13 @@ public class ExcelService {
 			}
 
 			holliDay.setCreationDate(LocalDateTime.now());
-			holliDay = holliDayRepository.save(holliDay);
 
-			holliDayDate.setHolliday(holliDay);
+			EHolliDay holliDayRecovered = holliDayRepository.findByName(holliDay.getName());
+
+			if (holliDayRecovered == null)
+				holliDay = holliDayRepository.save(holliDay);
+
+			holliDayDate.setHolliday(holliDay == null ? holliDayRecovered : holliDay);
 
 			if (city == null && cityRecovered == null) {
 				holliDayDate.setCity(null);
@@ -160,7 +174,7 @@ public class ExcelService {
 			}
 
 			holliDayDate.setCreationDate(LocalDateTime.now());
-			holliDayDateRepository.save(holliDayDate);
+			holliDayDateRepository.insert(holliDayDate);
 		}
 	}
 
@@ -181,6 +195,9 @@ public class ExcelService {
 		header.createCell(headerCount++).setCellValue("Data do feriado");
 		header.createCell(headerCount++).setCellValue("Nome do feriado");
 		header.createCell(headerCount++).setCellValue("Região");
+
+		ws.setAutoFilter(new CellRangeAddress(0, 0, 0, headerCount - 1));
+		ws.createFreezePane(0, 1);
 
 		int rownum = 1;
 

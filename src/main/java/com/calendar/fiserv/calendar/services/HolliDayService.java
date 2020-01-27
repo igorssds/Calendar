@@ -1,6 +1,7 @@
 package com.calendar.fiserv.calendar.services;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,16 @@ public class HolliDayService {
 			holliDay = holliDayRepository.save(holliDay);
 		}
 		return holliDay;
+	}
+
+	public void update(HolliDayDTO dto) {
+		Optional<EHolliDay> optionalHolliDay = holliDayRepository.findById(dto.getId());
+
+		if (optionalHolliDay.isPresent()) {
+			optionalHolliDay.get().setName(dto.getName().toUpperCase());
+			optionalHolliDay.get().setActive(dto.getActive());
+		}
+
+		holliDayRepository.save(optionalHolliDay.get());
 	}
 }

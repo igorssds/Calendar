@@ -32,7 +32,7 @@ import com.calendar.fiserv.calendar.services.StateService;
 import com.calendar.fiserv.calendar.services.dto.HolliDayDateRemoveDTO;
 
 @RestController
-@RequestMapping(value = "/holliday", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/holliday-date", produces = MediaType.APPLICATION_JSON_VALUE)
 public class HollidayDateController {
 
 	@Autowired
