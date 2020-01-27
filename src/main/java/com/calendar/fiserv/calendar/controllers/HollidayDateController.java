@@ -30,6 +30,7 @@ import com.calendar.fiserv.calendar.services.HolliDayDateService;
 import com.calendar.fiserv.calendar.services.HolliDayService;
 import com.calendar.fiserv.calendar.services.StateService;
 import com.calendar.fiserv.calendar.services.dto.HolliDayDateRemoveDTO;
+import com.calendar.fiserv.calendar.services.dto.HolliDayDateUpdateDTO;
 
 @RestController
 @RequestMapping(value = "/holliday-date", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -93,4 +94,10 @@ public class HollidayDateController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@PostMapping("/update")
+	public ResponseEntity<Void> update(@Valid @RequestBody HolliDayDateUpdateDTO dto) {
+		holliDayService.update(dto.getHolliDay());
+		holliDayDateService.update(dto);
+		return ResponseEntity.noContent().build();
+	}
 }

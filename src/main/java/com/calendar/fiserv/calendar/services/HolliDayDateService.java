@@ -8,6 +8,7 @@ import com.calendar.fiserv.calendar.domain.dto.HolliDayDateDTO;
 import com.calendar.fiserv.calendar.domain.dto.StateDTO;
 import com.calendar.fiserv.calendar.repositories.*;
 import com.calendar.fiserv.calendar.services.dto.HolliDayDateRemoveDTO;
+import com.calendar.fiserv.calendar.services.dto.HolliDayDateUpdateDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,6 +93,11 @@ public class HolliDayDateService {
 		holliDayDateRepository.remove(dto.getCountryId(), dto.getDay(), dto.getHolliDayId(), dto.getMonth());
 		holliDayRepository.deleteById(dto.getHolliDayId());
 
+	}
+
+	@Transactional
+	public void update(HolliDayDateUpdateDTO dto) {
+		holliDayDateRepository.update(dto);
 	}
 
 }
