@@ -49,6 +49,6 @@ public class HollidayDateRepositoryImpl implements HollidayDateRepositoryCustom 
 				.setParameter("holliDayId", dto.getId().getHolliDayId());
 
 		query.executeUpdate();
-
 	}
+
 }

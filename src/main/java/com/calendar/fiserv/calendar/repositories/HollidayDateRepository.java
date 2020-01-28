@@ -19,4 +19,7 @@ public interface HollidayDateRepository extends JpaRepository<EHolliDayDate, Str
 	@Query(value = "DELETE FROM HOLLIDAY_DATE h where h.country_id = :countryId and h.day = :day and h.month = :month and h.holliday_id = :holliDayId", nativeQuery = true)
 	public void remove(Long countryId, Long day, Long holliDayId, Long month);
 
+	@Query("select h from EHolliDayDate h where h.country.id = :countryId and h.holliday.id = :hollidayId and h.day = :day and h.month = :month")
+	public EHolliDayDate findByHolliday(Long countryId, Long hollidayId, Long day, Long month);
+
 }
