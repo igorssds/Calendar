@@ -67,7 +67,7 @@ public class HollidayDateController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@PostMapping("/insert/file")
+	@PostMapping("/file")
 	public ResponseEntity<Void> insertToFile(@RequestParam("file") MultipartFile file) throws IOException {
 		util.readToHolliDays(file.getInputStream());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -84,7 +84,7 @@ public class HollidayDateController {
 
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.add("Content-Disposition", "attachment;filename= \"exportHolliDays.xls\"");
-		httpHeaders.add("Content-Type","multipart/form-data");
+		httpHeaders.add("Content-Type", "multipart/form-data");
 
 		return ResponseEntity.ok().headers(httpHeaders).body(arquivo);
 	}
@@ -92,13 +92,13 @@ public class HollidayDateController {
 	@PostMapping("/remove")
 	public ResponseEntity<Void> remove(@RequestBody HolliDayDateRemoveDTO dto) {
 		holliDayDateService.remove(dto);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok().build();
 	}
 
 	@PostMapping("/update")
 	public ResponseEntity<Void> update(@Valid @RequestBody HolliDayDateUpdateDTO dto) {
 		holliDayService.update(dto.getHolliDay());
 		holliDayDateService.update(dto);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok().build();
 	}
 }

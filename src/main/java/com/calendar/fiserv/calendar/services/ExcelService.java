@@ -59,12 +59,7 @@ public class ExcelService {
 		XSSFSheet ws = wb.getSheetAt(0);
 
 		for (int i = 1; i < ws.getPhysicalNumberOfRows(); i++) {
-
 			EHolliDayDate holliDayDate = new EHolliDayDate();
-			EHolliDay holliDay = new EHolliDay();
-			ECity city = new ECity();
-			EState state = new EState();
-			ECountry country = new ECountry();
 			Row row = ws.getRow(i);
 
 			if (row.getCell(0) == null)
@@ -91,94 +86,85 @@ public class ExcelService {
 
 			holliDayDate.setActive(validateChar(row.getCell(3).getNumericCellValue()));
 
-			holliDay.setName(row.getCell(4).getStringCellValue().toUpperCase());
-			holliDay.setActive(validateChar(row.getCell(5).getNumericCellValue()));
+			EHolliDay holliDay = holliDayRepository.findByName(row.getCell(4).getStringCellValue().toUpperCase());
 
-			if (row.getCell(6) == null) {
-				city = null;
-			} else {
-				city.setName(row.getCell(6).getStringCellValue().toUpperCase());
-				city.setActive(validateChar(row.getCell(7).getNumericCellValue()));
-				city.setCreationDate(LocalDateTime.now());
+			if (holliDay == null) {
+				holliDay = new EHolliDay();
+				holliDay.setName(row.getCell(4).getStringCellValue().toUpperCase());
+				holliDay.setActive(validateChar(row.getCell(5).getNumericCellValue()));
+				holliDay.setCreationDate(LocalDateTime.now());
+				holliDay = holliDayRepository.save(holliDay);
 			}
 
-			if (row.getCell(8) == null) {
-				state = null;
-			} else {
-				state.setName(row.getCell(8).getStringCellValue().toUpperCase());
-				state.setActive(validateChar(row.getCell(10).getNumericCellValue()));
-				state.setCreationDate(LocalDateTime.now());
+			boolean isCity = false;
+			ECity city = null;
+			if (row.getCell(6) != null) {
+				city = cityRepository.findByName(row.getCell(6).getStringCellValue().toUpperCase());
+
+				if (city != null)
+					isCity = true;
+
+				if (city == null) {
+					city = new ECity();
+					city.setName(row.getCell(6).getStringCellValue().toUpperCase());
+					city.setActive(validateChar(row.getCell(7).getNumericCellValue()));
+					city.setCreationDate(LocalDateTime.now());
+				}
 			}
 
-			if (row.getCell(9) != null)
-				state.setCode(row.getCell(9).getStringCellValue());
+			boolean isState = false;
+			EState state = null;
+			if (row.getCell(8) != null) {
+				state = stateRepository.findByName(row.getCell(8).getStringCellValue().toUpperCase());
+
+				if (state != null)
+					isState = true;
+
+				if (state == null) {
+					state = new EState();
+					state.setName(row.getCell(8).getStringCellValue().toUpperCase());
+					state.setActive(validateChar(row.getCell(10).getNumericCellValue()));
+					state.setCreationDate(LocalDateTime.now());
+					if (row.getCell(9) != null)
+						state.setCode(row.getCell(9).getStringCellValue());
+				}
+
+			}
 
 			if (row.getCell(11) == null)
 				continue;
 
-			country.setName(row.getCell(11).getStringCellValue().toUpperCase());
-			country.setCode(row.getCell(12).getStringCellValue());
-			country.setActive(validateChar(row.getCell(13).getNumericCellValue()));
-			country.setHasState(validateChar(row.getCell(14).getNumericCellValue()));
-			country.setCreationDate(LocalDateTime.now());
+			ECountry country = countryRepository.findByName(row.getCell(11).getStringCellValue().toUpperCase());
 
-			ECountry countryRecovered = countryRepository.findByName(country.getName());
-
-			if (countryRecovered != null) {
-				country = null;
-			} else {
+			if (country == null) {
+				country = new ECountry();
+				country.setName(row.getCell(11).getStringCellValue().toUpperCase());
+				country.setCode(row.getCell(12).getStringCellValue());
+				country.setActive(validateChar(row.getCell(13).getNumericCellValue()));
+				country.setHasState(validateChar(row.getCell(14).getNumericCellValue()));
+				country.setCreationDate(LocalDateTime.now());
 				country = countryRepository.save(country);
 			}
 
-			EState stateRecovered = null;
-			if (state != null)
-				stateRecovered = stateRepository.findByName(state.getName());
-
-			if (stateRecovered != null || state == null) {
-				state = null;
-			} else {
-				state.setCountry(country == null ? countryRecovered : country);
+			if (state != null && !isState) {
+				state.setCountry(country);
 				state = stateRepository.save(state);
 			}
 
-			ECity cityRecovered = null;
-			if (state != null || stateRecovered != null)
-				cityRecovered = cityRepository.findByName(city.getName());
-
-			if (cityRecovered != null || city == null) {
-				city = null;
-			} else {
-				city.setCountry(country == null ? countryRecovered : country);
-				city.setState(state == null ? stateRecovered : state);
+			if (city != null && !isCity) {
+				city.setCountry(country);
+				city.setState(state);
 				city = cityRepository.save(city);
 			}
 
-			holliDay.setCreationDate(LocalDateTime.now());
-
-			EHolliDay holliDayRecovered = holliDayRepository.findByName(holliDay.getName());
-
-			if (holliDayRecovered != null) {
-				holliDay = null;
-			} else {
-				holliDay = holliDayRepository.save(holliDay);
-			}
-
-			holliDayDate.setHolliday(holliDay == null ? holliDayRecovered : holliDay);
-
-			if (city != null || cityRecovered != null)
-				holliDayDate.setCity(city == null ? cityRecovered : city);
-
-			holliDayDate.setCountry(country == null ? countryRecovered : country);
-
-			if (state != null || stateRecovered != null)
-				holliDayDate.setState(state == null ? stateRecovered : state);
-
+			holliDayDate.setHolliday(holliDay);
+			holliDayDate.setCity(city);
+			holliDayDate.setCountry(country);
+			holliDayDate.setState(state);
 			holliDayDate.setCreationDate(LocalDateTime.now());
 
-			EHolliDayDate dateRecovered = holliDayDateRepository.findByHolliday(
-					country == null ? countryRecovered.getId() : country.getId(),
-					holliDay == null ? holliDayRecovered.getId() : holliDay.getId(), holliDayDate.getDay(),
-					holliDayDate.getMonth());
+			EHolliDayDate dateRecovered = holliDayDateRepository.findByHolliday(country.getId(), holliDay.getId(),
+					holliDayDate.getDay(), holliDayDate.getMonth());
 
 			if (dateRecovered == null)
 				holliDayDateRepository.insert(holliDayDate);

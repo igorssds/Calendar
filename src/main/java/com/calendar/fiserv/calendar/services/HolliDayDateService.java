@@ -28,14 +28,17 @@ public class HolliDayDateService {
 	private HolliDayRepository holliDayRepository;
 
 	@Transactional
-	public EHolliDayDate fromDTO(HolliDayDateDTO dto, ECountry country, EState state, ECity city, EHolliDay holliDay) {
+	public void fromDTO(HolliDayDateDTO dto, ECountry country, EState state, ECity city, EHolliDay holliDay) {
 
-		EHolliDayDate holliDayDate = new EHolliDayDate(null, dto.getDay(), dto.getMonth(), dto.getYear(),
-				dto.getActive(), LocalDateTime.now(), null, holliDay, country, state, city);
+		EHolliDayDate holliDayDate = holliDayDateRepository.findByHolliday(country.getId(), holliDay.getId(),
+				dto.getDay(), dto.getMonth());
 
+		if (holliDayDate == null) {
+			holliDayDate = new EHolliDayDate(null, dto.getDay(), dto.getMonth(), dto.getYear(), dto.getActive(),
+					LocalDateTime.now(), null, holliDay, country, state, city);
+		}
 		holliDayDateRepository.insert(holliDayDate);
 
-		return holliDayDate;
 	}
 
 	public List<HolliDayDateDTO> findAll() {
