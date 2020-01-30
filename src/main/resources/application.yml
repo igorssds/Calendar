@@ -30,4 +30,4 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
-  profiles:    active:        
+  profiles:    active: uat        

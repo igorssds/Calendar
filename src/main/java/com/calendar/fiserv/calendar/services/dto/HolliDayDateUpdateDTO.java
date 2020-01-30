@@ -1,5 +1,6 @@
 package com.calendar.fiserv.calendar.services.dto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class HolliDayDateUpdateDTO {
 
+	@Valid
 	private HolliDayDateIdDTO id;
 
 	@NotNull(message = "Dia não pode ser nulo")

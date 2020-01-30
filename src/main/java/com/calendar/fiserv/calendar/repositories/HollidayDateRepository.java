@@ -12,7 +12,7 @@ import com.calendar.fiserv.calendar.domain.EHolliDayDate;
 @Repository
 public interface HollidayDateRepository extends JpaRepository<EHolliDayDate, String>, HollidayDateRepositoryCustom {
 
-	@Query("select h from EHolliDayDate h inner join fetch h.holliday inner join fetch h.country left join fetch h.state left join fetch h.city")
+	@Query("select h from EHolliDayDate h inner join fetch h.holliday inner join fetch h.country left join fetch h.state left join fetch h.city where h.holliday.active = 1 and h.active = 1")
 	public List<EHolliDayDate> findAllHolliDayDate();
 
 	@Modifying
