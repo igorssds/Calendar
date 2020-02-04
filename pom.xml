@@ -9,17 +9,33 @@
 		<version>2.2.2.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.calendar.fiserv</groupId>
+	<groupId>br.com.firstdata</groupId>
 	<artifactId>calendar</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>${packaging.type}</packaging>
 	<name>calendar</name>
-	<description>Demo project for Spring Boot</description>
+	<description>HolliDays</description>
 
 	<properties>
 		<java.version>1.8</java.version>
-		<poi-ooxml.version>3.10.1</poi-ooxml.version>
+		<packaging.type>war</packaging.type>
+
+		<beanio.version>2.1.0</beanio.version>
+		<dependency-check-maven.version>5.2.2</dependency-check-maven.version>
+		<feign.version>10.4.0</feign.version>
+		<hibernate-validator.version>5.4.3.Final</hibernate-validator.version>
+		<javax-validation.version>1.1.0.Final</javax-validation.version>
+		<jjwt.version>0.9.1</jjwt.version>
+		<mapstruct.version>1.3.0.Final</mapstruct.version>
+		<postgresql.version>42.2.5</postgresql.version>
+		<sonar.version>3.7.0.1746</sonar.version>
 		<swagger2.version>2.9.2</swagger2.version>
+		<poi-ooxml.version>3.10.1</poi-ooxml.version>
+
+		<!-- Sonar properties -->
+		<sonar.host.url>https://sonarq.iteris.com.br</sonar.host.url>
+		<sonar.projectKey>fd-api-template</sonar.projectKey>
+		<sonar.projectName>FirstData - Calendar</sonar.projectName>
 	</properties>
 
 	<dependencies>
@@ -30,33 +46,33 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<!-- Needed for Widlfly 9 -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.tomcat.embed</groupId>
+					<artifactId>tomcat-embed-websocket</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.hibernate.validator</groupId>
+					<artifactId>hibernate-validator</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.validation</groupId>
+					<artifactId>jakarta.validation-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.oracle.ojdbc</groupId>
 			<artifactId>ojdbc8</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>${poi-ooxml.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.springfox</groupId>
@@ -69,40 +85,137 @@
 			<version>${swagger2.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-jackson</artifactId>
+			<version>${feign.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-okhttp</artifactId>
+			<version>${feign.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.openfeign</groupId>
+			<artifactId>feign-slf4j</artifactId>
+			<version>${feign.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>${mapstruct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.beanio</groupId>
+			<artifactId>beanio</artifactId>
+			<version>${beanio.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+		<!-- Needed for Widlfly 9 -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate-validator.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi-ooxml.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>${dependency-check-maven.version}</version>
+				<configuration>
+					<formats>ALL</formats>
+					<failBuildOnAnyVulnerability>false</failBuildOnAnyVulnerability>
+					<failBuildOnCVSS>11</failBuildOnCVSS>
+					<junitFailOnCVSS>11</junitFailOnCVSS>
+					<failOnError>false</failOnError>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>${sonar.version}</version>
+			</plugin>
 		</plugins>
 	</build>
+
 	<profiles>
 		<profile>
 			<id>dev</id>
 			<properties>
 				<activeProfile>dev</activeProfile>
 			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.liquibase</groupId>
+						<artifactId>liquibase-maven-plugin</artifactId>
+						<version>3.8.0</version>
+						<configuration>
+							<propertyFile>src/main/resources/liquibase.properties</propertyFile>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 		<profile>
-			<id>uat</id>
+			<id>docker</id>
 			<properties>
-				<activeProfile>uat</activeProfile>
+				<activeProfile>docker</activeProfile>
 				<packaging.type>war</packaging.type>
 			</properties>
 			<dependencies>
@@ -113,6 +226,12 @@
 				</dependency>
 			</dependencies>
 		</profile>
+		<profile>
+			<id>uat</id>
+			<properties>
+				<activeProfile>uat</activeProfile>
+				<packaging.type>war</packaging.type>
+			</properties>
+		</profile>
 	</profiles>
-
 </project>

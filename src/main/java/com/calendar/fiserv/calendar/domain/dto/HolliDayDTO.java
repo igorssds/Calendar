@@ -1,8 +1,8 @@
 package com.calendar.fiserv.calendar.domain.dto;
 
-import javax.validation.constraints.NotBlank;
 
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

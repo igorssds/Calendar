@@ -1,0 +1,77 @@
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:r)
+
+variables:
+  BUILD_ARTIFACT: build
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+      - develop
+      - feature/devops
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - '*'
+
+jobs:
+
+  - job: Build
+    steps:
+      - script: ./mvnw clean
+      - script: ./mvnw package -Pdev -DskipTests
+      - task: CopyFiles@2
+        inputs:
+          Contents: '**\target\**'
+          TargetFolder: $(Build.ArtifactStagingDirectory)
+          CleanTargetFolder: true
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: $(Build.ArtifactStagingDirectory)
+          ArtifactName: $(BUILD_ARTIFACT)
+          Parallel: true
+          ParallelCount: 8
+  
+  - job: Test
+    dependsOn: Build
+    steps:
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          artifactName: $(BUILD_ARTIFACT)
+          downloadPath: $(Build.ArtifactStagingDirectory)
+          parallelizationLimit: 8
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: $(Build.ArtifactStagingDirectory)\$(BUILD_ARTIFACT)
+          TargetFolder: $(Build.SourcesDirectory)
+      - script: ./mvnw test
+  
+  - job: Quality
+    dependsOn: Test
+    steps:
+      - template: _devops/branch-steps.yml
+      - script: echo $(BRANCH)
+      - script: echo $(SONAR_TARGET_BRANCH)
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          artifactName: $(BUILD_ARTIFACT)
+          downloadPath: $(Build.ArtifactStagingDirectory)
+          parallelizationLimit: 8
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: $(Build.ArtifactStagingDirectory)\$(BUILD_ARTIFACT)
+          TargetFolder: $(Build.SourcesDirectory)
+      - script: ./mvnw dependency-check:check -DdataDirectory=$(DEPENDENCY_CHECK_DATA)
+      - task: SonarQubePrepare@4
+        inputs:
+          SonarQube: SonarQube
+          scannerMode: Other
+          extraProperties: |
+            sonar.branch.name=$(BRANCH)
+            $(SONAR_TARGET_BRANCH)
+            sonar.dependencyCheck.reportPath=$(Build.SourcesDirectory)/target/dependency-check-report.xml
+            sonar.dependencyCheck.htmlReportPath=$(Build.SourcesDirectory)/target/dependency-check-report.html
+      - script: ./mvnw sonar:sonar
