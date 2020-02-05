@@ -9,8 +9,6 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -84,64 +82,64 @@ public class ExcelService {
 				holliDayDate.setYear((long) row.getCell(2).getNumericCellValue());
 			}
 
-			holliDayDate.setActive(validateChar(row.getCell(3).getNumericCellValue()));
+			holliDayDate.setActive('1');
 
-			EHolliDay holliDay = holliDayRepository.findByName(row.getCell(4).getStringCellValue().toUpperCase());
+			EHolliDay holliDay = holliDayRepository.findByName(row.getCell(3).getStringCellValue().toUpperCase());
 
 			if (holliDay == null) {
 				holliDay = new EHolliDay();
-				holliDay.setName(row.getCell(4).getStringCellValue().toUpperCase());
-				holliDay.setActive(validateChar(row.getCell(5).getNumericCellValue()));
+				holliDay.setName(row.getCell(3).getStringCellValue().toUpperCase());
+				holliDay.setActive('1');
 				holliDay.setCreationDate(LocalDateTime.now());
 				holliDay = holliDayRepository.save(holliDay);
 			}
 
 			boolean isCity = false;
 			ECity city = null;
-			if (row.getCell(6) != null) {
-				city = cityRepository.findByName(row.getCell(6).getStringCellValue().toUpperCase());
+			if (row.getCell(4) != null) {
+				city = cityRepository.findByName(row.getCell(4).getStringCellValue().toUpperCase());
 
 				if (city != null)
 					isCity = true;
 
 				if (city == null) {
 					city = new ECity();
-					city.setName(row.getCell(6).getStringCellValue().toUpperCase());
-					city.setActive(validateChar(row.getCell(7).getNumericCellValue()));
+					city.setName(row.getCell(4).getStringCellValue().toUpperCase());
+					city.setActive('1');
 					city.setCreationDate(LocalDateTime.now());
 				}
 			}
 
 			boolean isState = false;
 			EState state = null;
-			if (row.getCell(8) != null) {
-				state = stateRepository.findByName(row.getCell(8).getStringCellValue().toUpperCase());
+			if (row.getCell(5) != null) {
+				state = stateRepository.findByName(row.getCell(5).getStringCellValue().toUpperCase());
 
 				if (state != null)
 					isState = true;
 
 				if (state == null) {
 					state = new EState();
-					state.setName(row.getCell(8).getStringCellValue().toUpperCase());
-					state.setActive(validateChar(row.getCell(10).getNumericCellValue()));
+					state.setName(row.getCell(5).getStringCellValue().toUpperCase());
+					state.setActive('1');
 					state.setCreationDate(LocalDateTime.now());
-					if (row.getCell(9) != null)
-						state.setCode(row.getCell(9).getStringCellValue());
+					if (row.getCell(6) != null)
+						state.setCode(row.getCell(6).getStringCellValue());
 				}
 
 			}
 
-			if (row.getCell(11) == null)
+			if (row.getCell(7) == null)
 				continue;
 
-			ECountry country = countryRepository.findByName(row.getCell(11).getStringCellValue().toUpperCase());
+			ECountry country = countryRepository.findByName(row.getCell(7).getStringCellValue().toUpperCase());
 
 			if (country == null) {
 				country = new ECountry();
-				country.setName(row.getCell(11).getStringCellValue().toUpperCase());
-				country.setCode(row.getCell(12).getStringCellValue());
-				country.setActive(validateChar(row.getCell(13).getNumericCellValue()));
-				country.setHasState(validateChar(row.getCell(14).getNumericCellValue()));
+				country.setName(row.getCell(7).getStringCellValue().toUpperCase());
+				country.setCode(row.getCell(8).getStringCellValue());
+				country.setActive('1');
+				country.setHasState('1');
 				country.setCreationDate(LocalDateTime.now());
 				country = countryRepository.save(country);
 			}
@@ -176,18 +174,24 @@ public class ExcelService {
 	}
 
 	public byte[] exportHolliDay() throws IOException {
-		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet ws = wb.createSheet("Feriados");
+		
+		XSSFWorkbook wb = new XSSFWorkbook();
+		XSSFSheet ws = wb.createSheet("Feriados");
 
 		List<HolliDayDateDTO> holliDayDate = holliDayDateService.findAll();
 
 		int headerCount = 0;
 		Row header = ws.createRow(0);
 
-		header.createCell(headerCount++).setCellValue("Tipo Feriado");
-		header.createCell(headerCount++).setCellValue("Data do feriado");
-		header.createCell(headerCount++).setCellValue("Nome do feriado");
-		header.createCell(headerCount++).setCellValue("Região");
+		header.createCell(headerCount++).setCellValue("Dia");
+		header.createCell(headerCount++).setCellValue("Mês");
+		header.createCell(headerCount++).setCellValue("Ano");
+		header.createCell(headerCount++).setCellValue("Nome Feriado");
+		header.createCell(headerCount++).setCellValue("Nome Cidade");
+		header.createCell(headerCount++).setCellValue("Nome Estado");
+		header.createCell(headerCount++).setCellValue("Codigo Estado");
+		header.createCell(headerCount++).setCellValue("Nome Pais");
+		header.createCell(headerCount++).setCellValue("Codigo Pais");
 
 		ws.setAutoFilter(new CellRangeAddress(0, 0, 0, headerCount - 1));
 		ws.createFreezePane(0, 1);
@@ -200,31 +204,32 @@ public class ExcelService {
 			int cellnum = 0;
 
 			Cell cell = row.createCell(cellnum++);
-
-			if (h.getCity() != null && h.getCity().getName() != null) {
-				cell.setCellValue("Munincipal");
-			} else if (h.getState() != null && h.getState().getName() != null) {
-				cell.setCellValue("Estadual");
-			} else if (h.getCountry() != null && h.getCountry().getName() != null) {
-				cell.setCellValue("Nacional");
-			}
+			cell.setCellValue(h.getDay());
 
 			cell = row.createCell(cellnum++);
-			Long year = h.getYear() == null ? returnYearActual() : h.getYear();
-			cell.setCellValue("" + h.getDay() + "/" + h.getMonth() + "/" + year);
+			cell.setCellValue(h.getMonth());
+
+			cell = row.createCell(cellnum++);
+			cell.setCellValue(h.getYear());
 
 			cell = row.createCell(cellnum++);
 			cell.setCellValue(h.getHolliday().getName());
 
 			cell = row.createCell(cellnum++);
+			cell.setCellValue(h.getCity().getName());
 
-			if (h.getCity() != null && h.getCity().getName() != null) {
-				cell.setCellValue(h.getCity().getName());
-			} else if (h.getState() != null && h.getState().getName() != null) {
-				cell.setCellValue(h.getState().getName());
-			} else if (h.getCountry() != null && h.getCountry().getName() != null) {
-				cell.setCellValue(h.getCountry().getName());
-			}
+			cell = row.createCell(cellnum++);
+			cell.setCellValue(h.getState().getName());
+
+			cell = row.createCell(cellnum++);
+			cell.setCellValue(h.getState().getCode());
+
+			cell = row.createCell(cellnum++);
+			cell.setCellValue(h.getCountry().getName());
+
+			cell = row.createCell(cellnum++);
+			cell.setCellValue(h.getCountry().getCode());
+
 		}
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

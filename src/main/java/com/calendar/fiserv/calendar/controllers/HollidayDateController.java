@@ -83,7 +83,7 @@ public class HollidayDateController {
 		byte[] arquivo = util.exportHolliDay();
 
 		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add("Content-Disposition", "attachment;filename= \"exportHolliDays.xls\"");
+		httpHeaders.add("Content-Disposition", "attachment;filename= \"exportHolliDays.xlsx\"");
 		httpHeaders.add("Content-Type", "multipart/form-data");
 
 		return ResponseEntity.ok().headers(httpHeaders).body(arquivo);
