@@ -42,8 +42,8 @@ public class HolliDayDateService {
 		if (holliDayDate == null) {
 			holliDayDate = new EHolliDayDate(null, dto.getDay(), dto.getMonth(), dto.getYear(), dto.getActive(),
 					LocalDateTime.now(), null, holliDay, country, state, city);
+			holliDayDateRepository.insert(holliDayDate);
 		}
-		holliDayDateRepository.insert(holliDayDate);
 
 	}
 
