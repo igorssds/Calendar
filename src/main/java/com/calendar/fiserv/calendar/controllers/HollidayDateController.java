@@ -31,6 +31,7 @@ import com.calendar.fiserv.calendar.services.HolliDayService;
 import com.calendar.fiserv.calendar.services.StateService;
 import com.calendar.fiserv.calendar.services.dto.HolliDayDateRemoveDTO;
 import com.calendar.fiserv.calendar.services.dto.HolliDayDateUpdateDTO;
+import com.calendar.fiserv.calendar.services.dto.XlsFileDTO;
 
 @RestController
 @RequestMapping(value = "/holliday-date", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,9 +69,16 @@ public class HollidayDateController {
 	}
 
 	@PostMapping("/file")
-	public ResponseEntity<Void> insertToFile(@RequestParam("file") MultipartFile file) throws IOException {
-		util.readToHolliDays(file.getInputStream());
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<byte[]> insertToFile(@RequestParam("file") MultipartFile file) throws IOException {
+		XlsFileDTO dto = util.readToHolliDays(file.getInputStream());
+
+		String fileName = dto.isWithErrors() ? "error" : "success";
+		
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add("Content-Disposition", "attachment;filename=\"" + fileName + ".xlsx\"");
+		httpHeaders.add("Content-Type", "multipart/form-data");
+
+		return ResponseEntity.status(dto.isWithErrors() ? HttpStatus.PARTIAL_CONTENT : HttpStatus.CREATED).headers(httpHeaders).body(dto.getFile());
 	}
 
 	@GetMapping

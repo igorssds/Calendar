@@ -4,8 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -28,9 +30,24 @@ import com.calendar.fiserv.calendar.repositories.CountryRepository;
 import com.calendar.fiserv.calendar.repositories.HolliDayRepository;
 import com.calendar.fiserv.calendar.repositories.HollidayDateRepository;
 import com.calendar.fiserv.calendar.repositories.StateRepository;
+import com.calendar.fiserv.calendar.services.dto.XlsFileDTO;
+import com.calendar.fiserv.calendar.services.xlsvalidation.InvalidColumn;
+import com.calendar.fiserv.calendar.services.xlsvalidation.InvalidRow;
+import com.calendar.fiserv.calendar.services.xlsvalidation.ValidatedCell;
+import com.calendar.fiserv.calendar.services.xlsvalidation.ValidatorBuilder;
 
 @Service
 public class ExcelService {
+
+	public static final int COLUNA_DIA = 0;
+	public static final int COLUNA_MES = 1;
+	public static final int COLUNA_ANO = 2;
+	public static final int COLUNA_NOME_FERIADO = 3;
+	public static final int COLUNA_NOME_CIDADE = 4;
+	public static final int COLUNA_NOME_ESTADO = 5;
+	public static final int COLUNA_CODIGO_ESTADO = 6;
+	public static final int COLUNA_NOME_PAIS = 7;
+	public static final int COLUNA_CODIGO_PAIS = 8;
 
 	@Autowired
 	private HollidayDateRepository holliDayDateRepository;
@@ -51,7 +68,7 @@ public class ExcelService {
 	private HolliDayDateService holliDayDateService;
 
 	@Transactional
-	public void readToHolliDays(InputStream stream) throws IOException {
+	public void readToHolliDays_OLD(InputStream stream) throws IOException {
 
 		XSSFWorkbook wb = new XSSFWorkbook(stream);
 		XSSFSheet ws = wb.getSheetAt(0);
@@ -60,7 +77,7 @@ public class ExcelService {
 			EHolliDayDate holliDayDate = new EHolliDayDate();
 			Row row = ws.getRow(i);
 
-			if (row.getCell(0) == null)
+			if (row.getCell(COLUNA_DIA) == null)
 				continue;
 
 			if ((long) row.getCell(0).getNumericCellValue() > 31)
@@ -169,12 +186,274 @@ public class ExcelService {
 		}
 	}
 
+	@Transactional
+	public XlsFileDTO readToHolliDays(InputStream stream) throws IOException {
+		XSSFWorkbook wb = new XSSFWorkbook(stream);
+		XSSFSheet ws = wb.getSheetAt(0);
+		List<InvalidRow> invalidRows = new ArrayList<>();
+
+		for (int i = 1; i < ws.getPhysicalNumberOfRows(); i++) {
+			Row row = ws.getRow(i);
+			List<InvalidColumn> invalidColumns = validRow(row);
+			if (invalidColumns.isEmpty()) {
+				persistRow(row);
+			} else {
+				invalidRows.add(new InvalidRow(invalidColumns, row));
+			}
+		}
+
+		byte[] file = invalidRowsToXLS(invalidRows);
+		return new XlsFileDTO(file, !invalidRows.isEmpty());
+
+	}
+
+	private byte[] invalidRowsToXLS(List<InvalidRow> invalidRows) throws IOException {
+		XSSFWorkbook wb = new XSSFWorkbook();
+		XSSFSheet ws = wb.createSheet("INVALID_HOLIDAY_INPUT");
+
+		createHeader(ws);
+
+		int rowCount = 1;
+		for (InvalidRow invalidRow : invalidRows) {
+			Row row = ws.createRow(rowCount++);
+			int totalCells = 9;
+			for (int i = 0; i < totalCells; i++) {
+				switch (i) {
+				case COLUNA_DIA:
+					if (invalidRow.getRow().getCell(i) != null) {
+						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getNumericCellValue());
+					} else {
+						row.createCell(i);
+					}
+
+					break;
+				case COLUNA_MES:
+					if (invalidRow.getRow().getCell(i) != null) {
+						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getNumericCellValue());
+					} else {
+						row.createCell(i);
+					}
+					break;
+				case COLUNA_ANO:
+					if (invalidRow.getRow().getCell(i) != null) {
+						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getNumericCellValue());
+					} else {
+						row.createCell(i);
+					}
+					break;
+				case COLUNA_NOME_FERIADO:
+					if (invalidRow.getRow().getCell(i) != null) {
+						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
+					} else {
+						row.createCell(i);
+					}
+					break;
+				case COLUNA_NOME_CIDADE:
+					if (invalidRow.getRow().getCell(i) != null) {
+						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
+					} else {
+						row.createCell(i);
+					}
+					break;
+				case COLUNA_NOME_ESTADO:
+					if (invalidRow.getRow().getCell(i) != null) {
+						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
+					} else {
+						row.createCell(i);
+					}
+					break;
+				case COLUNA_CODIGO_ESTADO:
+					if (invalidRow.getRow().getCell(i) != null) {
+						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
+					} else {
+						row.createCell(i);
+					}
+					break;
+				case COLUNA_NOME_PAIS:
+					if (invalidRow.getRow().getCell(i) != null) {
+						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
+					} else {
+						row.createCell(i);
+					}
+					break;
+				case COLUNA_CODIGO_PAIS:
+					if (invalidRow.getRow().getCell(i) != null) {
+						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
+					} else {
+						row.createCell(i);
+					}
+					break;
+				}
+			}
+
+			row.createCell(totalCells).setCellValue(buildStringInvalidCauses(invalidRow.getColumnNumber()));
+		}
+
+		return writeWorkbook(wb);
+
+	}
+
+	private byte[] writeWorkbook(XSSFWorkbook wb) throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		wb.write(out);
+		byte[] report = out.toByteArray();
+		out.close();
+		return report;
+	}
+
+	private String buildStringInvalidCauses(List<InvalidColumn> invalidColumns) {
+
+		List<String> causes = invalidColumns.stream().map(column -> column.getCause()).collect(Collectors.toList());
+		return String.join("; ", causes);
+
+	}
+
+	private void createHeader(XSSFSheet ws) {
+		Row header = ws.createRow(0);
+
+		int headerCount = 0;
+
+		header.createCell(headerCount++).setCellValue("Day");
+		header.createCell(headerCount++).setCellValue("Month");
+		header.createCell(headerCount++).setCellValue("Year");
+		header.createCell(headerCount++).setCellValue("Holiday name");
+		header.createCell(headerCount++).setCellValue("City name");
+		header.createCell(headerCount++).setCellValue("State name");
+		header.createCell(headerCount++).setCellValue("State code");
+		header.createCell(headerCount++).setCellValue("Country name");
+		header.createCell(headerCount++).setCellValue("Country code");
+		
+		ws.setAutoFilter(new CellRangeAddress(0, 0, 0, headerCount - 1));
+		ws.createFreezePane(0, 1);
+	}
+
+	private void persistRow(Row row) {
+
+		EHolliDayDate holliDayDate = new EHolliDayDate();
+
+		holliDayDate.setDay((long) row.getCell(0).getNumericCellValue());
+		holliDayDate.setMonth((long) row.getCell(1).getNumericCellValue());
+
+		Long year = returnYearActual();
+
+		if (row.getCell(2) != null) {
+			holliDayDate.setYear((long) row.getCell(2).getNumericCellValue());
+		} else {
+			holliDayDate.setYear(year); // ?
+		}
+
+		holliDayDate.setActive('1');
+
+		EHolliDay holliDay = holliDayRepository.findByName(row.getCell(3).getStringCellValue().toUpperCase());
+
+		if (holliDay == null) {
+			holliDay = new EHolliDay();
+			holliDay.setName(row.getCell(3).getStringCellValue().toUpperCase());
+			holliDay.setActive('1');
+			holliDay.setCreationDate(LocalDateTime.now());
+			holliDay = holliDayRepository.save(holliDay);
+		}
+
+		boolean isCity = false;
+		ECity city = null;
+		if (row.getCell(4) != null) {
+			city = cityRepository.findByName(row.getCell(4).getStringCellValue().toUpperCase());
+
+			if (city != null)
+				isCity = true;
+
+			if (city == null) {
+				city = new ECity();
+				city.setName(row.getCell(4).getStringCellValue().toUpperCase());
+				city.setActive('1');
+				city.setCreationDate(LocalDateTime.now());
+			}
+		}
+
+		boolean isState = false;
+		EState state = null;
+		if (row.getCell(5) != null) {
+			state = stateRepository.findByName(row.getCell(5).getStringCellValue().toUpperCase());
+
+			if (state != null)
+				isState = true;
+
+			if (state == null) {
+				state = new EState();
+				state.setName(row.getCell(5).getStringCellValue().toUpperCase());
+				state.setActive('1');
+				state.setCreationDate(LocalDateTime.now());
+				if (row.getCell(6) != null)
+					state.setCode(row.getCell(6).getStringCellValue());
+			}
+
+		}
+
+		ECountry country = countryRepository.findByName(row.getCell(7).getStringCellValue().toUpperCase());
+
+		if (country == null) {
+			country = new ECountry();
+			country.setName(row.getCell(7).getStringCellValue().toUpperCase());
+			country.setCode(row.getCell(8).getStringCellValue());
+			country.setActive('1');
+			country.setHasState('1');
+			country.setCreationDate(LocalDateTime.now());
+			country = countryRepository.save(country);
+		}
+
+		if (state != null && !isState) {
+			state.setCountry(country);
+			state = stateRepository.save(state);
+		}
+
+		if (city != null && !isCity) {
+			city.setCountry(country);
+			city.setState(state);
+			city = cityRepository.save(city);
+		}
+
+		holliDayDate.setHolliday(holliDay);
+		holliDayDate.setCity(city);
+		holliDayDate.setCountry(country);
+		holliDayDate.setState(state);
+		holliDayDate.setCreationDate(LocalDateTime.now());
+
+		EHolliDayDate dateRecovered = holliDayDateRepository.findByHolliday(country.getId(), holliDay.getId(),
+				holliDayDate.getDay(), holliDayDate.getMonth());
+
+		if (dateRecovered == null)
+			holliDayDateRepository.insert(holliDayDate);
+
+	}
+
+	private List<InvalidColumn> validRow(Row row) {
+
+		List<InvalidColumn> invalidColumns = new ArrayList<>();
+
+		int totalCells = 9;
+		for (int i = 0; i < totalCells; i++) {
+			ValidatedCell validatedCell;
+			try {
+				validatedCell = ValidatorBuilder.build(i, row.getCell(i)).valid();
+			} catch (Exception ex) {
+				validatedCell = new ValidatedCell(ex.getMessage());
+			}
+
+			if (!validatedCell.isValid()) {
+				invalidColumns.add(new InvalidColumn(i, validatedCell.getCauseOfInvalid()));
+			}
+		}
+
+		return invalidColumns;
+
+	}
+
 	public char validateChar(double num) {
 		return num == 1 ? '1' : '0';
 	}
 
 	public byte[] exportHolliDay() throws IOException {
-		
+
 		XSSFWorkbook wb = new XSSFWorkbook();
 		XSSFSheet ws = wb.createSheet("Feriados");
 
