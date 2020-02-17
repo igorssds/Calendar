@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -19,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.calendar.fiserv.calendar.controllers.exception.InvalidRowException;
 import com.calendar.fiserv.calendar.domain.ECity;
 import com.calendar.fiserv.calendar.domain.ECountry;
 import com.calendar.fiserv.calendar.domain.EHolliDay;
@@ -30,7 +30,6 @@ import com.calendar.fiserv.calendar.repositories.CountryRepository;
 import com.calendar.fiserv.calendar.repositories.HolliDayRepository;
 import com.calendar.fiserv.calendar.repositories.HollidayDateRepository;
 import com.calendar.fiserv.calendar.repositories.StateRepository;
-import com.calendar.fiserv.calendar.services.dto.XlsFileDTO;
 import com.calendar.fiserv.calendar.services.xlsvalidation.InvalidColumn;
 import com.calendar.fiserv.calendar.services.xlsvalidation.InvalidRow;
 import com.calendar.fiserv.calendar.services.xlsvalidation.ValidatedCell;
@@ -187,7 +186,7 @@ public class ExcelService {
 	}
 
 	@Transactional
-	public XlsFileDTO readToHolliDays(InputStream stream) throws IOException {
+	public void readToHolliDays(InputStream stream) throws IOException, InvalidRowException {
 		XSSFWorkbook wb = new XSSFWorkbook(stream);
 		XSSFSheet ws = wb.getSheetAt(0);
 		List<InvalidRow> invalidRows = new ArrayList<>();
@@ -202,129 +201,10 @@ public class ExcelService {
 			}
 		}
 
-		byte[] file = invalidRowsToXLS(invalidRows);
-		return new XlsFileDTO(file, !invalidRows.isEmpty());
-
-	}
-
-	private byte[] invalidRowsToXLS(List<InvalidRow> invalidRows) throws IOException {
-		XSSFWorkbook wb = new XSSFWorkbook();
-		XSSFSheet ws = wb.createSheet("INVALID_HOLIDAY_INPUT");
-
-		createHeader(ws);
-
-		int rowCount = 1;
-		for (InvalidRow invalidRow : invalidRows) {
-			Row row = ws.createRow(rowCount++);
-			int totalCells = 9;
-			for (int i = 0; i < totalCells; i++) {
-				switch (i) {
-				case COLUNA_DIA:
-					if (invalidRow.getRow().getCell(i) != null) {
-						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getNumericCellValue());
-					} else {
-						row.createCell(i);
-					}
-
-					break;
-				case COLUNA_MES:
-					if (invalidRow.getRow().getCell(i) != null) {
-						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getNumericCellValue());
-					} else {
-						row.createCell(i);
-					}
-					break;
-				case COLUNA_ANO:
-					if (invalidRow.getRow().getCell(i) != null) {
-						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getNumericCellValue());
-					} else {
-						row.createCell(i);
-					}
-					break;
-				case COLUNA_NOME_FERIADO:
-					if (invalidRow.getRow().getCell(i) != null) {
-						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
-					} else {
-						row.createCell(i);
-					}
-					break;
-				case COLUNA_NOME_CIDADE:
-					if (invalidRow.getRow().getCell(i) != null) {
-						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
-					} else {
-						row.createCell(i);
-					}
-					break;
-				case COLUNA_NOME_ESTADO:
-					if (invalidRow.getRow().getCell(i) != null) {
-						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
-					} else {
-						row.createCell(i);
-					}
-					break;
-				case COLUNA_CODIGO_ESTADO:
-					if (invalidRow.getRow().getCell(i) != null) {
-						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
-					} else {
-						row.createCell(i);
-					}
-					break;
-				case COLUNA_NOME_PAIS:
-					if (invalidRow.getRow().getCell(i) != null) {
-						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
-					} else {
-						row.createCell(i);
-					}
-					break;
-				case COLUNA_CODIGO_PAIS:
-					if (invalidRow.getRow().getCell(i) != null) {
-						row.createCell(i).setCellValue(invalidRow.getRow().getCell(i).getStringCellValue());
-					} else {
-						row.createCell(i);
-					}
-					break;
-				}
-			}
-
-			row.createCell(totalCells).setCellValue(buildStringInvalidCauses(invalidRow.getColumnNumber()));
+		if (!invalidRows.isEmpty()) {
+			throw new InvalidRowException(invalidRows);
 		}
 
-		return writeWorkbook(wb);
-
-	}
-
-	private byte[] writeWorkbook(XSSFWorkbook wb) throws IOException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		wb.write(out);
-		byte[] report = out.toByteArray();
-		out.close();
-		return report;
-	}
-
-	private String buildStringInvalidCauses(List<InvalidColumn> invalidColumns) {
-
-		List<String> causes = invalidColumns.stream().map(column -> column.getCause()).collect(Collectors.toList());
-		return String.join("; ", causes);
-
-	}
-
-	private void createHeader(XSSFSheet ws) {
-		Row header = ws.createRow(0);
-
-		int headerCount = 0;
-
-		header.createCell(headerCount++).setCellValue("Day");
-		header.createCell(headerCount++).setCellValue("Month");
-		header.createCell(headerCount++).setCellValue("Year");
-		header.createCell(headerCount++).setCellValue("Holiday name");
-		header.createCell(headerCount++).setCellValue("City name");
-		header.createCell(headerCount++).setCellValue("State name");
-		header.createCell(headerCount++).setCellValue("State code");
-		header.createCell(headerCount++).setCellValue("Country name");
-		header.createCell(headerCount++).setCellValue("Country code");
-		
-		ws.setAutoFilter(new CellRangeAddress(0, 0, 0, headerCount - 1));
-		ws.createFreezePane(0, 1);
 	}
 
 	private void persistRow(Row row) {

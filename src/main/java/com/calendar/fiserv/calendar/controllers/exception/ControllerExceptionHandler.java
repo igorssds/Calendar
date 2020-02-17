@@ -1,5 +1,6 @@
 package com.calendar.fiserv.calendar.controllers.exception;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -20,5 +21,15 @@ public class ControllerExceptionHandler {
 		}
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+	}
+
+	@ExceptionHandler(InvalidRowException.class)
+	public ResponseEntity<byte[]> validation(InvalidRowException exception) {
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add("Content-Disposition", "attachment;filename=\"errors.xlsx\"");
+		httpHeaders.add("Content-Type", "multipart/form-data");
+
+		return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).headers(httpHeaders)
+				.body(exception.getXlsFileWithErrors());
 	}
 }

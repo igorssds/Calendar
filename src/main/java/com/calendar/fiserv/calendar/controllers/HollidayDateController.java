@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.calendar.fiserv.calendar.controllers.exception.InvalidRowException;
 import com.calendar.fiserv.calendar.domain.ECity;
 import com.calendar.fiserv.calendar.domain.ECountry;
 import com.calendar.fiserv.calendar.domain.EHolliDay;
@@ -31,7 +32,6 @@ import com.calendar.fiserv.calendar.services.HolliDayService;
 import com.calendar.fiserv.calendar.services.StateService;
 import com.calendar.fiserv.calendar.services.dto.HolliDayDateRemoveDTO;
 import com.calendar.fiserv.calendar.services.dto.HolliDayDateUpdateDTO;
-import com.calendar.fiserv.calendar.services.dto.XlsFileDTO;
 
 @RestController
 @RequestMapping(value = "/holliday-date", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -69,16 +69,10 @@ public class HollidayDateController {
 	}
 
 	@PostMapping("/file")
-	public ResponseEntity<byte[]> insertToFile(@RequestParam("file") MultipartFile file) throws IOException {
-		XlsFileDTO dto = util.readToHolliDays(file.getInputStream());
-
-		String fileName = dto.isWithErrors() ? "error" : "success";
-		
-		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add("Content-Disposition", "attachment;filename=\"" + fileName + ".xlsx\"");
-		httpHeaders.add("Content-Type", "multipart/form-data");
-
-		return ResponseEntity.status(dto.isWithErrors() ? HttpStatus.PARTIAL_CONTENT : HttpStatus.CREATED).headers(httpHeaders).body(dto.getFile());
+	public ResponseEntity<?> insertToFile(@RequestParam("file") MultipartFile file)
+			throws IOException, InvalidRowException {
+		util.readToHolliDays(file.getInputStream());
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping
