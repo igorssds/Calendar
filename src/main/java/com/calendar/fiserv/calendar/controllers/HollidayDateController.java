@@ -68,6 +68,18 @@ public class HollidayDateController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
+	/**
+	 * The service inserts holiday dates described by the XLS file, each holiday per
+	 * row. If the file contains some invalid row, such as a holiday with invalid
+	 * date or without name, the service inserts the valid holidays, and returns a
+	 * HTTP 206 (Partial Content), with a XLS file body describing the validation
+	 * errors.
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 * @throws InvalidRowException
+	 */
 	@PostMapping("/file")
 	public ResponseEntity<?> insertToFile(@RequestParam("file") MultipartFile file)
 			throws IOException, InvalidRowException {
