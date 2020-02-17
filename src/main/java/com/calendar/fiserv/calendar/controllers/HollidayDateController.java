@@ -73,7 +73,7 @@ public class HollidayDateController {
 	 * row. If the file contains some invalid row, such as a holiday with invalid
 	 * date or without name, the service inserts the valid holidays, and returns a
 	 * HTTP 206 (Partial Content), with a XLS file body describing the validation
-	 * errors.
+	 * errors. Otherwise, it will return a HTTP 200 OK without body.
 	 * 
 	 * @param file
 	 * @return
