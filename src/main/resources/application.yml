@@ -16,6 +16,8 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
+        ejb:
+          interceptor: com.calendar.fiserv.calendar.repositories.JpaInterceptor
         format_sql: true
         dialect: org.hibernate.dialect.Oracle12cDialect
         proc:

@@ -8,6 +8,11 @@ import com.calendar.fiserv.calendar.domain.ECity;
 @Repository
 public interface CityRepository extends JpaRepository<ECity, Long>{
 
-	ECity findByName(String name);
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public ECity findByName(String name);
 
 }

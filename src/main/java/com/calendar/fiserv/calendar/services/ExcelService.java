@@ -237,14 +237,17 @@ public class ExcelService {
 		boolean isCity = false;
 		ECity city = null;
 		if (row.getCell(4) != null) {
-			city = cityRepository.findByName(row.getCell(4).getStringCellValue().toUpperCase());
+
+			String plainTextCity = StringNormalizer
+					.toPlainTextUpperCase(row.getCell(COLUNA_NOME_CIDADE).getStringCellValue());
+			city = cityRepository.findByName(plainTextCity);
 
 			if (city != null)
 				isCity = true;
 
 			if (city == null) {
 				city = new ECity();
-				city.setName(row.getCell(4).getStringCellValue().toUpperCase());
+				city.setName(plainTextCity);
 				city.setActive('1');
 				city.setCreationDate(LocalDateTime.now());
 			}
@@ -252,19 +255,22 @@ public class ExcelService {
 
 		boolean isState = false;
 		EState state = null;
-		if (row.getCell(5) != null) {
-			state = stateRepository.findByName(row.getCell(5).getStringCellValue().toUpperCase());
+		if (row.getCell(COLUNA_CODIGO_ESTADO) != null && row.getCell(COLUNA_NOME_ESTADO) != null) {
+
+			String plainTextStateCode = StringNormalizer
+					.toPlainTextUpperCase(row.getCell(COLUNA_CODIGO_ESTADO).getStringCellValue());
+			state = stateRepository.findByCode(plainTextStateCode);
 
 			if (state != null)
 				isState = true;
 
 			if (state == null) {
 				state = new EState();
-				state.setName(row.getCell(5).getStringCellValue().toUpperCase());
+				state.setName(row.getCell(COLUNA_NOME_ESTADO).getStringCellValue());
 				state.setActive('1');
 				state.setCreationDate(LocalDateTime.now());
 				if (row.getCell(6) != null)
-					state.setCode(row.getCell(6).getStringCellValue());
+					state.setCode(plainTextStateCode);
 			}
 
 		}

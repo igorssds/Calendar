@@ -14,4 +14,6 @@ public interface StateRepository extends JpaRepository<EState, Long>{
 
 	EState findByName(String name);
 
+	EState findByCode(String plainTextStateCode);
+
 }
