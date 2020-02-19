@@ -24,7 +24,7 @@ public class SwaggerConfig {
 	}
 
 	private ApiInfo getApiInfo() {
-		return new ApiInfoBuilder().title("Foo Bar").description("API Calendar").version("1.1.0").build();
+		return new ApiInfoBuilder().title("Foo Bar").description("API Calendar").version("1.2.0").build();
 	}
 
 	private static Predicate<RequestHandler> controllers() {

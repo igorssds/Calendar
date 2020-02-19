@@ -32,7 +32,7 @@ public class HollidayDateRepositoryImpl implements HollidayDateRepositoryCustom 
 								hdd.getCity() != null ? hdd.getCity().getId() : null))
 				.setParameter("hollidayId", hdd.getHolliday().getId()).setParameter("day", hdd.getDay())
 				.setParameter("month", hdd.getMonth())
-				.setParameter("year", new TypedParameterValue(StandardBasicTypes.LONG, hdd.getYear()));
+				.setParameter("year", new TypedParameterValue(StandardBasicTypes.INTEGER, hdd.getYear()));
 
 		query.executeUpdate();
 	}

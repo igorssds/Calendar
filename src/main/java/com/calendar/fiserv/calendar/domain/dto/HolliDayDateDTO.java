@@ -17,13 +17,13 @@ public class HolliDayDateDTO {
 
 	@NotNull(message = "Dia não pode ser nulo")
 	@Max(value = 31, message = "O dia não pode ser maior que 31")
-	private Long day;
+	private Integer day;
 
 	@NotNull
-	@Max(value = 12 , message = "O mês não pode ser maior que 12")
-	private Long month;
+	@Max(value = 12, message = "O mês não pode ser maior que 12")
+	private Integer month;
 
-	private Long year;
+	private Integer year;
 
 	private char active;
 

@@ -29,6 +29,8 @@ public class JpaInterceptor extends EmptyInterceptor {
 			EState eState = (EState) entity;
 			eState.setCode(StringNormalizer.toPlainTextUpperCase(eState.getCode()));
 		}
+		
+		
 
 		return super.onSave(entity, id, state, propertyNames, types);
 	}

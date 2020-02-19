@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.calendar.fiserv.calendar.controllers.dto.NextBusinessDayDTO;
 import com.calendar.fiserv.calendar.controllers.exception.InvalidRowException;
+import com.calendar.fiserv.calendar.controllers.form.NextBusinessDayRequestForm;
 import com.calendar.fiserv.calendar.domain.ECity;
 import com.calendar.fiserv.calendar.domain.ECountry;
 import com.calendar.fiserv.calendar.domain.EHolliDay;
@@ -29,6 +31,7 @@ import com.calendar.fiserv.calendar.services.CountryService;
 import com.calendar.fiserv.calendar.services.ExcelService;
 import com.calendar.fiserv.calendar.services.HolliDayDateService;
 import com.calendar.fiserv.calendar.services.HolliDayService;
+import com.calendar.fiserv.calendar.services.NextBusinessDayService;
 import com.calendar.fiserv.calendar.services.StateService;
 import com.calendar.fiserv.calendar.services.dto.HolliDayDateRemoveDTO;
 import com.calendar.fiserv.calendar.services.dto.HolliDayDateUpdateDTO;
@@ -54,6 +57,9 @@ public class HollidayDateController {
 
 	@Autowired
 	private ExcelService util;
+
+	@Autowired
+	private NextBusinessDayService nextBusinessDayService;
 
 	@PostMapping
 	public ResponseEntity<Void> insert(@Valid @RequestBody HolliDayDateDTO dto) {
@@ -84,7 +90,7 @@ public class HollidayDateController {
 	public ResponseEntity<?> insertToFile(@RequestParam("file") MultipartFile file)
 			throws IOException, InvalidRowException {
 		util.readToHolliDays(file.getInputStream());
-		return ResponseEntity.ok().build();
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
 	@GetMapping
@@ -114,5 +120,13 @@ public class HollidayDateController {
 		holliDayService.update(dto.getHolliDay());
 		holliDayDateService.update(dto);
 		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping(path = "/next-business-day")
+	public ResponseEntity<NextBusinessDayDTO> getNextBusinessDay(@Valid @RequestBody NextBusinessDayRequestForm form) {
+
+		NextBusinessDayDTO nextBusinessDayDTO = nextBusinessDayService.getNextBusinessDay(form);
+		return ResponseEntity.ok(nextBusinessDayDTO);
+
 	}
 }

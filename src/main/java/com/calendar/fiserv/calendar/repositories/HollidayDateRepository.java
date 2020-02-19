@@ -1,6 +1,7 @@
 package com.calendar.fiserv.calendar.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,6 +21,8 @@ public interface HollidayDateRepository extends JpaRepository<EHolliDayDate, Str
 	public void remove(Long countryId, Long day, Long holliDayId, Long month);
 
 	@Query("select h from EHolliDayDate h where h.country.id = :countryId and h.holliday.id = :hollidayId and h.day = :day and h.month = :month")
-	public EHolliDayDate findByHolliday(Long countryId, Long hollidayId, Long day, Long month);
+	public EHolliDayDate findByHolliday(Long countryId, Long hollidayId, Integer day, Integer month);
 
+	@Query("SELECT h FROM EHolliDayDate h WHERE h.year = :hYear AND h.month = :hMonth AND h.day = :hDay")
+	public Optional<EHolliDayDate> findByDate(Integer hYear, Integer hMonth, Integer hDay);
 }

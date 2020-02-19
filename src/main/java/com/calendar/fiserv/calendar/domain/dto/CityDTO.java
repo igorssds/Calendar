@@ -1,7 +1,5 @@
 package com.calendar.fiserv.calendar.domain.dto;
 
-import java.util.List;
-
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -26,5 +24,4 @@ public class CityDTO {
 	@JsonProperty("active")
 	private char active;
 
-	List<HolliDayDateDTO> holliDayDate;
 }

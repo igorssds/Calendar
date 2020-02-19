@@ -79,23 +79,23 @@ public class ExcelService {
 			if (row.getCell(COLUNA_DIA) == null)
 				continue;
 
-			if ((long) row.getCell(0).getNumericCellValue() > 31)
+			if ((int) row.getCell(0).getNumericCellValue() > 31)
 				continue;
 
-			holliDayDate.setDay((long) row.getCell(0).getNumericCellValue());
+			holliDayDate.setDay((int) row.getCell(0).getNumericCellValue());
 
-			if (row.getCell(1) == null || (long) row.getCell(1).getNumericCellValue() > 12)
+			if (row.getCell(1) == null || (int) row.getCell(1).getNumericCellValue() > 12)
 				continue;
 
-			holliDayDate.setMonth((long) row.getCell(1).getNumericCellValue());
+			holliDayDate.setMonth((int) row.getCell(1).getNumericCellValue());
 
-			Long year = returnYearActual();
+			int year = returnYearActual();
 
 			if (row.getCell(2) != null) {
-				if ((long) row.getCell(2).getNumericCellValue() < year)
+				if ((int) row.getCell(2).getNumericCellValue() < year)
 					continue;
 
-				holliDayDate.setYear((long) row.getCell(2).getNumericCellValue());
+				holliDayDate.setYear((int) row.getCell(2).getNumericCellValue());
 			}
 
 			holliDayDate.setActive('1');
@@ -211,13 +211,13 @@ public class ExcelService {
 
 		EHolliDayDate holliDayDate = new EHolliDayDate();
 
-		holliDayDate.setDay((long) row.getCell(0).getNumericCellValue());
-		holliDayDate.setMonth((long) row.getCell(1).getNumericCellValue());
+		holliDayDate.setDay((int) row.getCell(0).getNumericCellValue());
+		holliDayDate.setMonth((int) row.getCell(1).getNumericCellValue());
 
-		Long year = returnYearActual();
+		int year = returnYearActual();
 
 		if (row.getCell(2) != null) {
-			holliDayDate.setYear((long) row.getCell(2).getNumericCellValue());
+			holliDayDate.setYear((int) row.getCell(2).getNumericCellValue());
 		} else {
 			holliDayDate.setYear(year); // ?
 		}
@@ -405,7 +405,7 @@ public class ExcelService {
 
 	}
 
-	private Long returnYearActual() {
-		return (long) Calendar.getInstance().get(Calendar.YEAR);
+	private int returnYearActual() {
+		return (int) Calendar.getInstance().get(Calendar.YEAR);
 	}
 }

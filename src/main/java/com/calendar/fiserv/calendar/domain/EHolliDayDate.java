@@ -29,12 +29,12 @@ public class EHolliDayDate {
 	private String id;
 
 	@Column(nullable = false)
-	private Long day;
+	private Integer day;
 
 	@Column(nullable = false)
-	private Long month;
+	private Integer month;
 
-	private Long year;
+	private Integer year;
 
 	@NotNull
 	private char active;
