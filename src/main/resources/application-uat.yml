@@ -1,6 +1,10 @@
 spring:
   datasource:
     jndi-name: java:/BRTMP
+#    url: jdbc:oracle:thin:@//localhost:1521/xe
+#    username: calendar
+#    password: calendar
+#    driver-class-name: oracle.jdbc.OracleDriver
   jpa:
     show-sql: false
     hibernate:
