@@ -71,7 +71,7 @@ public class HollidayDateController {
 
 		holliDayDateService.fromDTO(dto, country, state, city, holliDay);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.ok().build();
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class HollidayDateController {
 	public ResponseEntity<?> insertToFile(@RequestParam("file") MultipartFile file)
 			throws IOException, InvalidRowException {
 		util.readToHolliDays(file.getInputStream());
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping
