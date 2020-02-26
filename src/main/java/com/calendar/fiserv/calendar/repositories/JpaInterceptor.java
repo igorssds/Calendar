@@ -24,13 +24,11 @@ public class JpaInterceptor extends EmptyInterceptor {
 			ECity city = (ECity) entity;
 			city.setName(StringNormalizer.toPlainTextUpperCase(city.getName()));
 		}
-		
-		if(entity instanceof EState) {
+
+		if (entity instanceof EState) {
 			EState eState = (EState) entity;
 			eState.setCode(StringNormalizer.toPlainTextUpperCase(eState.getCode()));
 		}
-		
-		
 
 		return super.onSave(entity, id, state, propertyNames, types);
 	}

@@ -30,15 +30,17 @@ public class InvalidRowException extends Exception {
 	private List<InvalidRow> invalidRows;
 	private byte[] xlsFileWithErrors;
 
-	public InvalidRowException(List<InvalidRow> invalidRows) {
-		this.invalidRows = invalidRows;
-		try {
-			this.xlsFileWithErrors = createFile(invalidRows);
-		} catch (Exception ex) {
-			log.error(ex.getMessage());
-			this.xlsFileWithErrors = null;
-		}
-	}
+//	public InvalidRowException(List<InvalidRow> invalidRows) {
+//		this.invalidRows = invalidRows;
+//		try {
+//			this.xlsFileWithErrors = createFile(invalidRows);
+//		} catch (Exception ex) {
+//			log.error(ex.getMessage());
+//			this.xlsFileWithErrors = null;
+//		}
+//	}
+
+
 
 	private byte[] createFile(List<InvalidRow> invalidRows) throws IOException {
 		XSSFWorkbook wb = new XSSFWorkbook();

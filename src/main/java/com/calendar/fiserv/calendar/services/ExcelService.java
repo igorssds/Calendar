@@ -202,7 +202,7 @@ public class ExcelService {
 		}
 
 		if (!invalidRows.isEmpty()) {
-			throw new InvalidRowException(invalidRows);
+//			throw new InvalidRowException(invalidRows);
 		}
 
 	}

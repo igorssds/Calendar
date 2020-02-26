@@ -1,5 +1,8 @@
 package com.calendar.fiserv.calendar.controllers.exception;
 
+import javax.persistence.EntityNotFoundException;
+
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +26,28 @@ public class ControllerExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
 	}
 
-	@ExceptionHandler(InvalidRowException.class)
-	public ResponseEntity<byte[]> validation(InvalidRowException exception) {
+	@ExceptionHandler(XlsWithErrorsException.class)
+	public ResponseEntity<byte[]> validation(XlsWithErrorsException exception) {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.add("Content-Disposition", "attachment;filename=\"errors.xlsx\"");
 		httpHeaders.add("Content-Type", "multipart/form-data");
 
 		return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).headers(httpHeaders)
-				.body(exception.getXlsFileWithErrors());
+				.body(exception.getXlsFile());
+	}
+
+	@ExceptionHandler(EmptyResultDataAccessException.class)
+	public ResponseEntity<Void> validation(EmptyResultDataAccessException exception) {
+		return ResponseEntity.notFound().build();
+	}
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<Void> validation(EntityNotFoundException exception) {
+		return ResponseEntity.notFound().build();
+	}
+
+	@ExceptionHandler(InvalidHolidayException.class)
+	public ResponseEntity<String> validation(InvalidHolidayException exception) {
+		return ResponseEntity.badRequest().body(exception.getMessage());
 	}
 }
