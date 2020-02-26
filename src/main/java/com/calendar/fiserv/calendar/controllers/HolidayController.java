@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.calendar.fiserv.calendar.controllers.dto.HolidayDTO;
-import com.calendar.fiserv.calendar.controllers.exception.InvalidRowException;
 import com.calendar.fiserv.calendar.controllers.form.HolidayForm;
 import com.calendar.fiserv.calendar.services.HolidayService;
 
@@ -68,8 +67,7 @@ public class HolidayController {
 	}
 
 	@PostMapping("/file")
-	public ResponseEntity<Void> createFromXlsFile(@RequestParam("file") MultipartFile file)
-			throws InvalidRowException, IOException {
+	public ResponseEntity<Void> createFromXlsFile(@RequestParam("file") MultipartFile file) throws IOException {
 		holidayService.createFromXlsFile(file);
 		return ResponseEntity.ok().build();
 	}
@@ -79,7 +77,7 @@ public class HolidayController {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.add("Content-Disposition", "attachment;filename=\"holidays.xlsx\"");
 		httpHeaders.add("Content-Type", "multipart/form-data");
-		
+
 		byte[] file = holidayService.readAllToXls();
 
 		return ResponseEntity.ok().headers(httpHeaders).body(file);

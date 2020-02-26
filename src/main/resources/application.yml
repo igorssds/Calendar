@@ -16,8 +16,6 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
-        ejb:
-          interceptor: com.calendar.fiserv.calendar.repositories.JpaInterceptor
         format_sql: true
         dialect: org.hibernate.dialect.Oracle12cDialect
         proc:
@@ -27,7 +25,7 @@ spring:
             non_contextual_creation: true
   liquibase:
     change-log: classpath:changelog.xml
-    enabled: true
+    enabled: false
     liquibase-schema: calendar
   output:
     ansi:
