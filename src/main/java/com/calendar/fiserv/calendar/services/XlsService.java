@@ -34,7 +34,7 @@ public class XlsService {
 		for (int i = 1; i < ws.getPhysicalNumberOfRows(); i++) {
 			Row row = ws.getRow(i);
 			if (!isEmpty(row)) {
-				holidays.add(extractRow(row));
+				holidays.add(extractHoliday(row));
 			}
 		}
 
@@ -51,7 +51,7 @@ public class XlsService {
 		return true;
 	}
 
-	private HolidayForm extractRow(Row row) {
+	private HolidayForm extractHoliday(Row row) {
 		return HolidayForm.builder()
 
 				.date(extractDate(row))
@@ -133,9 +133,12 @@ public class XlsService {
 
 	private void populateRow(Row row, EHoliday holiday) {
 
-		row.createCell(XlsColumns.DAY_COLUMN.getIndex()).setCellValue(holiday.getDate() != null ? holiday.getDate().getDayOfMonth() : 0);
-		row.createCell(XlsColumns.MONTH_COLUMN.getIndex()).setCellValue(holiday.getDate() != null ? holiday.getDate().getMonthValue() : 0);
-		row.createCell(XlsColumns.YEAR_COLUMN.getIndex()).setCellValue(holiday.getDate() != null ? holiday.getDate().getYear() : 0);
+		row.createCell(XlsColumns.DAY_COLUMN.getIndex())
+				.setCellValue(holiday.getDate() != null ? holiday.getDate().getDayOfMonth() : 0);
+		row.createCell(XlsColumns.MONTH_COLUMN.getIndex())
+				.setCellValue(holiday.getDate() != null ? holiday.getDate().getMonthValue() : 0);
+		row.createCell(XlsColumns.YEAR_COLUMN.getIndex())
+				.setCellValue(holiday.getDate() != null ? holiday.getDate().getYear() : 0);
 		row.createCell(XlsColumns.HOLIDAY_NAME_COLUMN.getIndex()).setCellValue(holiday.getName());
 		row.createCell(XlsColumns.CITY_NAME_COLUMN.getIndex()).setCellValue(holiday.getCityName());
 		row.createCell(XlsColumns.STATE_NAME_COLUMN.getIndex()).setCellValue(holiday.getStateName());
