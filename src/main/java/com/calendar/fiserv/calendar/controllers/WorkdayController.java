@@ -15,7 +15,7 @@ import com.calendar.fiserv.calendar.controllers.dto.WorkdayDTO;
 import com.calendar.fiserv.calendar.services.WorkdayService;
 
 @RestController
-@RequestMapping("/workday")
+@RequestMapping("/holiday/workday")
 public class WorkdayController {
 
 	@Autowired
